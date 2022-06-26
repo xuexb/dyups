@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  dyups:
+    image: xiaowudev-dyups
+    container_name: xiaowudev-dyups
+    build: .
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      DYUPS_TOKEN: OK
+      DYUPS_CONSUL_ORIGIN: http://host.docker.internal:8500
+      DYUPS_CONSUL_KEY: dyups/sg01.ddns.xiaowu.dev
