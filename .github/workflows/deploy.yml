@@ -1,0 +1,21 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '部署机器'
+        default: 'all'
+        required: true
+        type: choice
+        options:
+          - all
+          - sh01
+          - sg01
+          - bj01 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
