@@ -1,13 +1,15 @@
-name: Auto SSL
+name: Create SSL Certificate
 
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'test'
-        default: 'latest'
-        required: false
-        type: string
+  workflow_call:
+    secrets:
+      ALI_KEY:
+        required: true
+      ALI_SECRET:
+        required: true
+      NAMECOM_TOKEN:
+        required: true
 
 env:
   ACME: /home/runner/.acme.sh/acme.sh
