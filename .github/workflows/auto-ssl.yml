@@ -22,22 +22,23 @@ jobs:
         run: |
           curl  https://get.acme.sh | sh
       - uses: actions/checkout@v3
-      - name: Create SSL
+      - name: Create xuexb SSL
         run: |
           mkdir -p ./ca/apijs.net
           $ACME --issue \
             --server letsencrypt \
             --dns dns_ali \
             --log \
-            -d "apijs.net"
+            -d "apijs.net" \
+            -d "*.apijs.net"
           $ACME --installcert \
             -d "apijs.net" \
             --key-file ./ca/apijs.net/apijs.net.key \
             --fullchain-file ./ca/apijs.net/apijs.net.cer
       - name: Git push
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config user.name xuexb
+          git config user.email fe.xiaowu@gmail.com
           git add .
           git commit -m "feat: Add SSL [skip ci]"
           git push
