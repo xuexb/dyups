@@ -24,17 +24,38 @@ jobs:
       - uses: actions/checkout@v3
       - name: Create xuexb SSL
         run: |
-          mkdir -p ./ca/apijs.net
+          mkdir -p ./ca/xuexb
           $ACME --issue \
             --server letsencrypt \
             --dns dns_ali \
             --log \
-            -d "apijs.net" \
-            -d "*.apijs.net"
+            -d "xuexb.com" \
+            -d "xuexb.cn" \
+            -d "*.xuexb.cn" \
+            -d "*.xuexb.com" \
+            -d "*.static.xuexb.com" \
+            -d "*.dev.xuexb.com" \
+            -d "*.proxy.xuexb.com" \
+            -d "*.api.xuexb.com"
           $ACME --installcert \
-            -d "apijs.net" \
-            --key-file ./ca/apijs.net/apijs.net.key \
-            --fullchain-file ./ca/apijs.net/apijs.net.cer
+            -d "xuexb.com" \
+            --key-file ./ca/xuexb/xuexb.key \
+            --fullchain-file ./ca/xuexb/xuexb.cer
+      - name: Create jiandansousuo SSL
+        run: |
+          mkdir -p ./ca/jiandansousuo
+          $ACME --issue \
+            --server letsencrypt \
+            --dns dns_ali \
+            --log \
+            -d "jiandansousuo.com" \
+            -d "jiandansousuo.cn" \
+            -d "*.jiandansousuo.cn" \
+            -d "*.jiandansousuo.com"
+          $ACME --installcert \
+            -d "jiandansousuo.com" \
+            --key-file ./ca/jiandansousuo/jiandansousuo.key \
+            --fullchain-file ./ca/jiandansousuo/jiandansousuo.cer
       - name: Git push
         run: |
           git config user.name xuexb
