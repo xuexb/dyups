@@ -11,8 +11,9 @@ on:
 
 env:
   ACME: /home/runner/.acme.sh/acme.sh
-  Ali_Key: ${{ secrets.Ali_Key }}
-  Ali_Secret: ${{ secrets.Ali_Secret }}
+  Ali_Key: ${{ secrets.ALI_KEY }}
+  Ali_Secret: ${{ secrets.ALI_SECRET }}
+  Namecom_Token: ${{ secrets.NAMECOM_TOKEN }}
 
 jobs:
   acme:
@@ -56,6 +57,29 @@ jobs:
             -d "jiandansousuo.com" \
             --key-file ./ca/jiandansousuo/jiandansousuo.key \
             --fullchain-file ./ca/jiandansousuo/jiandansousuo.cer
+      - name: Create xiaowu SSL
+        run: |
+          mkdir -p ./ca/xiaowu
+          $ACME --issue \
+            --server letsencrypt \
+            --dns dns_namecom \
+            --log \
+            -d "xiaowu.dev" \
+            -d "*.xiaowu.dev" \
+            -d "jiandansousuo.org" \
+            -d "*.jiandansousuo.org" \
+            -d "apijs.org" \
+            -d "*.apijs.org" \
+            -d "kakawoniu.com" \
+            -d "*.kakawoniu.com" \
+            -d "shangxian.app" \
+            -d "*.shangxian.app" \
+            -d "xiaoshuo.io" \
+            -d "*.xiaoshuo.io"
+          $ACME --installcert \
+            -d "xiaowu.dev" \
+            --key-file ./ca/xiaowu/xiaowu.key \
+            --fullchain-file ./ca/xiaowu/xiaowu.cer
       - name: Git push
         run: |
           git config user.name xuexb
