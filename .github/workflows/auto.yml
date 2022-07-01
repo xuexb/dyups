@@ -1,0 +1,10 @@
+name: Auto SSL and Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
