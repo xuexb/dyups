@@ -7,7 +7,7 @@
 ### Get data
 
 ```bash
-curl -H 'x-dyups-token: token' dyups/api/list
+curl -H 'x-dyups-token: token' dyups/api/all
 curl -H 'x-dyups-token: token' dyups/api/test.xuexb.com
 ```
 
@@ -32,4 +32,18 @@ curl -H 'x-dyups-token: token' \
 
 ```bash
 curl -H 'x-dyups-token: token' dyups/api/update
+```
+
+## SQL
+
+```sql
+SET NAMES utf8mb4;
+
+CREATE TABLE `upstream` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `domain` char(100) NOT NULL DEFAULT '',
+  `server` text NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `domain` (`domain`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
 ```
