@@ -122,6 +122,6 @@ jobs:
           debug: true
           command_timeout: 30m
           script: |
-            if [ "$(curl -sL -w '%{http_code}' -H 'host: dyups' --connect-timeout 3 127.0.0.1?r=$RANDOM -o /dev/null)" != "200" ]; then
+            if [ "$(curl -sL -w '%{http_code}' -H 'host: dyups' -H 'x-dyups-token: ${{ env.DYUPS_TOKEN }}' --connect-timeout 3 127.0.0.1/api/reload?r=$RANDOM -o /dev/null)" != "200" ]; then
               exit 1
             fi
