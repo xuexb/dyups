@@ -50,7 +50,6 @@ on:
 env:
   REPO: xuexb/dyups
   IMAGE_VERSION: ${{ inputs.version || github.event.inputs.version }}
-  DEPLOY_ENV: ${{ inputs.envname || github.event.inputs.envname }}
   REPOSITORY_TAG: ghcr.io/xuexb/dyups:${{ inputs.version || github.event.inputs.version }}
   OWNER: xuexb
   CONTAINER_NAME: dyups
@@ -82,7 +81,7 @@ jobs:
     needs: check-version
     if: |
       needs.check-version.outputs.result == '200' && (
-        inputs.version == 'prd' || github.event.inputs.version == 'prd'
+        inputs.envname == 'prd' || github.event.inputs.envname == 'prd'
       )
     steps:
       - name: Login
