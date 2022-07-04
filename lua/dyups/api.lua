@@ -1,12 +1,15 @@
-local http = require("socket.http")
+local mysql = require("resty.mysql")
 local ltn12 = require("ltn12")
 local cjson = require("cjson")
 
 local _M = {};
 
-_M.DYUPS_CONSUL_ORIGIN = os.getenv("DYUPS_CONSUL_ORIGIN")
-_M.DYUPS_CONSUL_KEY = os.getenv("DYUPS_CONSUL_KEY")
-
+_M.DYUPS_DB_HOST = os.getenv("DYUPS_DB_HOST")
+_M.DYUPS_DB_PORT = os.getenv("DYUPS_DB_PORT")
+_M.DYUPS_DB_DATABASE = os.getenv("DYUPS_DB_DATABASE")
+_M.DYUPS_DB_USER = os.getenv("DYUPS_DB_USER")
+_M.DYUPS_DB_PASSWORD = os.getenv("DYUPS_DB_PASSWORD")
+_M.DYUPS_DB_CHARSET = os.getenv("")
 
 _M._VERSION = "0.1"
 
@@ -25,46 +28,112 @@ function _M:dump(o)
     end
 end
 
+function _M:connect()
+    local db, err = mysql:new()
+    if not db then
+        ngx.say("failed to instantiate mysql: ", err)
+        return nil
+    end
 
-function _M:update()
-    local resp = {}
-    local res, code = http.request {
-        url = _M.DYUPS_CONSUL_ORIGIN .. "/v1/kv/" .. _M.DYUPS_CONSUL_KEY .. "/?dc=dc1&recurse=true&raw=true",
-        sink = ltn12.sink.table(resp)
+    db:set_timeout(1000) -- 1 sec
+
+    local ok, err, errcode, sqlstate = db:connect{
+        host = _M.DYUPS_DB_HOST,
+        port = _M.DYUPS_DB_PORT,
+        database = _M.DYUPS_DB_DATABASE,
+        user = _M.DYUPS_DB_USER,
+        password = _M.DYUPS_DB_PASSWORD,
+        charset = _M.DYUPS_DB_CHARSET
     }
 
-    if code ~= 200 then
-        return false, code
+    if not ok then
+        ngx.say("failed to connect: ", err, ": ", errcode, " ", sqlstate)
+        return nil
     end
 
-    local resp = table.concat(resp);
-    local resp = cjson.decode(resp);
-    local upstreams = {}
-    for i, v in ipairs(resp) do
-        local data = ngx.decode_base64(v.Value)
-        local data = cjson.decode(data)
-        ngx.shared.upstream_list:set(data.domain, cjson.encode(data))
-    end
-
-    return true, code
+    return db
 end
 
-function _M:get(domain)
-    local data = ngx.shared.upstream_list:get(domain)
-    if not data then return { upstream = nil } end
-    return cjson.decode(data)
+function _M:close(db)
+    if not db then return nil end
+    db:close()
+    return nil
 end
 
-function _M:getAll()
-    local data = {}
-    local keys = ngx.shared.upstream_list:get_keys()
-    for i, key in ipairs(keys) do
-        local item = ngx.shared.upstream_list:get(key)
-        local item = cjson.decode(item)
-        data[item.domain] = item
+function _M:parseServer(data)
+    if not data or #data == 0 then return {} end
+    for i, v in ipairs(data) do
+        data[i].server = cjson.decode(data[i].server)
     end
     return data
 end
 
+function _M:getAll()
+    local db = _M:connect();
+    if not db then return nil end
+    local sql = "select domain, server from upstream"
+    local res, err, errno, sqlstate = db:query(sql)
+    _M:close(db)
+
+    if res then
+        return _M:parseServer(res)
+    else
+        return nil
+    end
+end
+
+function _M:getByDomain(domain)
+    local db = _M:connect();
+    if not db then
+        return nil
+    end
+    local sql = "select domain, server from upstream where domain = " .. ngx.quote_sql_str(domain) .. " limit 1"
+    local res, err, errno, sqlstate = db:query(sql)
+    _M:close(db)
+
+    if res then
+        return _M:parseServer(res)[1]
+    else
+        return nil
+    end
+end
+
+function _M:removeDomain(domain)
+    local db = _M:connect();
+    if not db then return nil end
+    local sql = "delete from upstream where domain = " .. ngx.quote_sql_str(domain)
+    local res, err, errno, sqlstate = db:query(sql)
+    _M:close(db)
+    return res
+end
+
+function _M:addDomain(domain, server)
+    local db = _M:connect();
+    if not db then
+        return nil
+    end
+    local sql = "INSERT INTO upstream (domain, server) VALUES (\'" .. domain .. "\', \'" .. server .. "\') ON DUPLICATE KEY UPDATE server=VALUES(server)"
+    local res, err, errno, sqlstate = db:query(sql)
+    _M:close(db)
+    return res
+end
+
+function _M:reload()
+    local data = _M:getAll()
+    if not data then
+        return nil
+    end
+    local upstreams = {}
+    for i, v in ipairs(data) do
+        ngx.shared.upstream_list:set(v.domain, cjson.encode(v.server))
+    end
+    return true
+end
+
+function _M:get(domain)
+    local data = ngx.shared.upstream_list:get(domain)
+    if not data then return nill end
+    return cjson.decode(data)
+end
 
 return _M

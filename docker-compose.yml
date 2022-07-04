@@ -8,7 +8,18 @@ services:
     ports:
       - 80:80
       - 443:443
+    volumes:
+      - ./ca:/etc/nginx/ca
+      - ./html:/etc/nginx/html
+      - ./inc:/etc/nginx/inc
+      - ./lua:/etc/nginx/lua
+      - ./vhost:/etc/nginx/vhost
+      - ./nginx.conf:/etc/nginx/nginx.conf
     environment:
       DYUPS_TOKEN: OK
-      DYUPS_CONSUL_ORIGIN: http://host.docker.internal:8500
-      DYUPS_CONSUL_KEY: dyups/sg01.ddns.xiaowu.dev
+      DYUPS_DB_HOST: 8.141.208.241
+      DYUPS_DB_PORT: 3306
+      DYUPS_DB_DATABASE: dyups
+      DYUPS_DB_USER: user_xiaowudev_dyups_prd
+      DYUPS_DB_PASSWORD: DoA5+1!XR@oYr6h&g1T1udf
+      DYUPS_DB_CHARSET: utf8mb4
