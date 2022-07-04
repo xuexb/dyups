@@ -76,13 +76,22 @@ jobs:
             echo "curl https://ghcr.io/v2/${{ env.REPO }}/manifests/${{ env.IMAGE_VERSION }} Response => $HTTP_CODE"
             exit 1
           fi
+  deploy-test:
+    runs-on: ubuntu-latest
+    needs: check-version
+    steps:
+      - run: |
+        echo ${{ needs.check-version.outputs.result }}
+        echo '----'
+        echo ${{ inputs.envname }}
+        echo '----'
+        echo ${{ github.event.inputs.envname }}
   deploy-prd:
     runs-on: ubuntu-latest
     needs: check-version
     if: |
-      needs.check-version.outputs.result == '200' && (
-        inputs.envname == 'prd' || github.event.inputs.envname == 'prd'
-      )
+      needs.check-version.outputs.result == '200'
+      && (inputs.envname == 'prd' || github.event.inputs.envname == 'prd')
     steps:
       - name: Login
         run: |
