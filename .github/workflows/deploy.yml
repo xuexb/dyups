@@ -83,9 +83,6 @@ jobs:
       needs.check-version.outputs.result == '200'
       && (inputs.envname == 'dev' || github.event.inputs.envname == 'dev')
     steps:
-      - name: Login
-        run: |
-          echo ${{ secrets.GHCR_PACKAGES_READ_TOKEN }} | docker login ghcr.io --username ${{ env.OWNER }} --password-stdin
       - name: Deploy
         uses: appleboy/ssh-action@master
         with:
@@ -96,6 +93,7 @@ jobs:
           debug: true
           command_timeout: 30m
           script: |
+            echo ${{ secrets.GHCR_PACKAGES_READ_TOKEN }} | docker login ghcr.io --username ${{ env.OWNER }} --password-stdin
             docker pull ${{ env.REPOSITORY_TAG }} \
               && docker ps -q --filter "name=${{ env.CONTAINER_NAME }}" | xargs docker rm -f \
               && docker run \
