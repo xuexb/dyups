@@ -76,23 +76,12 @@ jobs:
             echo "curl https://ghcr.io/v2/${{ env.REPO }}/manifests/${{ env.IMAGE_VERSION }} Response => $HTTP_CODE"
             exit 1
           fi
-  deploy-test:
-    runs-on: ubuntu-latest
-    needs: check-version
-    steps:
-      - name: dump
-        run: |
-          echo ${{ needs.check-version.outputs.result }}
-          echo '----'
-          echo ${{ inputs.envname }}
-          echo '----'
-          echo ${{ github.event.inputs.envname }}
-  deploy-prd:
+  deploy-dev:
     runs-on: ubuntu-latest
     needs: check-version
     if: |
       needs.check-version.outputs.result == '200'
-      && (inputs.envname == 'prd' || github.event.inputs.envname == 'prd')
+      && (inputs.envname == 'dev' || github.event.inputs.envname == 'dev')
     steps:
       - name: Login
         run: |
@@ -100,10 +89,10 @@ jobs:
       - name: Deploy
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_HOST_PRD }}
-          username: ${{ secrets.SSH_USERNAME_PRD }}
-          key: ${{ secrets.SSH_KEY_PRD }}
-          port: ${{ secrets.SSH_PORT_PRD }}
+          host: ${{ secrets.SSH_HOST_DEV }}
+          username: ${{ secrets.SSH_USERNAME_DEV }}
+          key: ${{ secrets.SSH_KEY_DEV }}
+          port: ${{ secrets.SSH_PORT_DEV }}
           debug: true
           command_timeout: 30m
           script: |
@@ -126,10 +115,10 @@ jobs:
       - name: Test
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_HOST_PRD }}
-          username: ${{ secrets.SSH_USERNAME_PRD }}
-          key: ${{ secrets.SSH_KEY_PRD }}
-          port: ${{ secrets.SSH_PORT_PRD }}
+          host: ${{ secrets.SSH_HOST_DEV }}
+          username: ${{ secrets.SSH_USERNAME_DEV }}
+          key: ${{ secrets.SSH_KEY_DEV }}
+          port: ${{ secrets.SSH_PORT_DEV }}
           debug: true
           command_timeout: 30m
           script: |
