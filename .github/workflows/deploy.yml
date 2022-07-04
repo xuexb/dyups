@@ -81,7 +81,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: check-version
     if: |
-      needs.check-version.outputs.result == '200' && env.DEPLOY_ENV == 'prd'
+      needs.check-version.outputs.result == '200' && (
+        inputs.version == 'prd' || github.event.inputs.version == 'prd'
+      )
     steps:
       - name: Login
         run: |
