@@ -80,12 +80,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: check-version
     steps:
-      - run: |
-        echo ${{ needs.check-version.outputs.result }}
-        echo '----'
-        echo ${{ inputs.envname }}
-        echo '----'
-        echo ${{ github.event.inputs.envname }}
+      - name: dump
+        run: |
+          echo ${{ needs.check-version.outputs.result }}
+          echo '----'
+          echo ${{ inputs.envname }}
+          echo '----'
+          echo ${{ github.event.inputs.envname }}
   deploy-prd:
     runs-on: ubuntu-latest
     needs: check-version
