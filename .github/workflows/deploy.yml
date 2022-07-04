@@ -103,14 +103,14 @@ jobs:
                 -p 443:443 \
                 --rm \
                 -d \
-                --name ${{ env.CONTAINER_NAME }} \
-                --env DYUPS_TOKEN=${{ secrets.DYUPS_TOKEN }} \
-                --env DYUPS_DB_HOST=${{ secrets.DYUPS_DB_HOST }} \
-                --env DYUPS_DB_PORT=${{ secrets.DYUPS_DB_PORT }} \
-                --env DYUPS_DB_DATABASE=${{ secrets.DYUPS_DB_DATABASE }} \
-                --env DYUPS_DB_USER=${{ secrets.DYUPS_DB_USER }} \
-                --env DYUPS_DB_PASSWORD=${{ secrets.DYUPS_DB_PASSWORD }} \
-                --env DYUPS_DB_CHARSET=${{ secrets.DYUPS_DB_CHARSET }} \
+                --name "${{ env.CONTAINER_NAME }}" \
+                --env "DYUPS_TOKEN=${{ secrets.DYUPS_TOKEN }}" \
+                --env "DYUPS_DB_HOST=${{ secrets.DYUPS_DB_HOST }}" \
+                --env "DYUPS_DB_PORT=${{ secrets.DYUPS_DB_PORT }}" \
+                --env "DYUPS_DB_DATABASE=${{ secrets.DYUPS_DB_DATABASE }}" \
+                --env "DYUPS_DB_USER=${{ secrets.DYUPS_DB_USER }}" \
+                --env "DYUPS_DB_PASSWORD=${{ secrets.DYUPS_DB_PASSWORD }}" \
+                --env "DYUPS_DB_CHARSET=${{ secrets.DYUPS_DB_CHARSET }}" \
                 ${{ env.REPOSITORY_TAG }}
       - name: Test
         uses: appleboy/ssh-action@master
