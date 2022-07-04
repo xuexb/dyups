@@ -3,7 +3,7 @@ name: Deploy
 on:
   workflow_call:
     inputs:
-      env:
+      envname:
         description: '部署环境'
         default: 'dev'
         required: true
@@ -33,7 +33,7 @@ on:
       DYUPS_DB_CHARSET:
   workflow_dispatch:
     inputs:
-      env:
+      envname:
         description: '部署环境'
         default: 'dev'
         required: true
@@ -50,7 +50,7 @@ on:
 env:
   REPO: xuexb/dyups
   IMAGE_VERSION: ${{ inputs.version || github.event.inputs.version }}
-  DEPLOY_ENV: ${{ inputs.env || github.event.inputs.env }}
+  DEPLOY_ENV: ${{ inputs.envname || github.event.inputs.envname }}
   REPOSITORY_TAG: ghcr.io/xuexb/dyups:${{ inputs.version || github.event.inputs.version }}
   OWNER: xuexb
   CONTAINER_NAME: dyups
@@ -80,7 +80,8 @@ jobs:
   deploy-prd:
     runs-on: ubuntu-latest
     needs: check-version
-    if: ${{ needs.check-version.outputs.result == '200' && env.DEPLOY_ENV == 'prd' }}
+    if: |
+      needs.check-version.outputs.result == '200' && env.DEPLOY_ENV == 'prd'
     steps:
       - name: Login
         run: |
