@@ -23,7 +23,6 @@ on:
       SSH_KEY_PRD:
       SSH_PORT_PRD:
       GHCR_ACCESS_TOKEN:
-      GHCR_PACKAGES_READ_TOKEN:
       DYUPS_TOKEN:
       DYUPS_DB_HOST:
       DYUPS_DB_PORT:
@@ -31,6 +30,7 @@ on:
       DYUPS_DB_USER:
       DYUPS_DB_PASSWORD:
       DYUPS_DB_CHARSET:
+      GHCR_MIRROR:
   workflow_dispatch:
     inputs:
       envname:
@@ -51,6 +51,7 @@ env:
   REPO: xuexb/dyups
   IMAGE_VERSION: ${{ inputs.version || github.event.inputs.version }}
   REPOSITORY_TAG: ghcr.io/xuexb/dyups:${{ inputs.version || github.event.inputs.version }}
+  MIRROR_REPOSITORY_TAG: ${{ secrets.GHCR_MIRROR }}/xuexb/dyups:${{ inputs.version || github.event.inputs.version }}
   OWNER: xuexb
   CONTAINER_NAME: dyups
 
@@ -93,8 +94,7 @@ jobs:
           debug: true
           command_timeout: 30m
           script: |
-            echo ${{ secrets.GHCR_PACKAGES_READ_TOKEN }} | docker login ghcr.io --username ${{ env.OWNER }} --password-stdin
-            docker pull ${{ env.REPOSITORY_TAG }} \
+            docker pull ${{ env.MIRROR_REPOSITORY_TAG }} \
               && docker ps -q --filter "name=${{ env.CONTAINER_NAME }}" | xargs docker rm -f \
               && docker run \
                 -p 80:80 \
@@ -109,7 +109,7 @@ jobs:
                 --env "DYUPS_DB_USER=${{ secrets.DYUPS_DB_USER }}" \
                 --env "DYUPS_DB_PASSWORD=${{ secrets.DYUPS_DB_PASSWORD }}" \
                 --env "DYUPS_DB_CHARSET=${{ secrets.DYUPS_DB_CHARSET }}" \
-                ${{ env.REPOSITORY_TAG }}
+                ${{ env.MIRROR_REPOSITORY_TAG }}
       - name: Test
         uses: appleboy/ssh-action@master
         with:
