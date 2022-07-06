@@ -14,10 +14,11 @@ on:
           - xiaowu (name)
 
   workflow_call:
-    caname:
-      description: '证书类别'
-      default: all
-      type: string
+    inputs:
+      caname:
+        description: '证书类别'
+        default: all
+        type: string
     secrets:
       ALI_KEY:
       ALI_SECRET:
