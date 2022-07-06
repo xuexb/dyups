@@ -2,18 +2,30 @@ name: Create SSL Certificate
 
 on:
   workflow_dispatch:
+    inputs:
+      caname:
+        description: '证书类别'
+        default: all
+        type: choice
+        options:
+          - all
+          - xuexb (ali)
+          - jiandansousuo (ali)
+          - xiaowu (name)
+
   workflow_call:
+    caname:
+      description: '证书类别'
+      default: all
+      type: string
     secrets:
       ALI_KEY:
-        required: true
       ALI_SECRET:
-        required: true
       NAMECOM_TOKEN:
-        required: true
       NAMECOM_USERNAME:
-        required: true
 
 env:
+  CA_NAME: ${{ inputs.caname || github.event.inputs.caname }}
   ACME: /home/runner/.acme.sh/acme.sh
   Ali_Key: ${{ secrets.ALI_KEY }}
   Ali_Secret: ${{ secrets.ALI_SECRET }}
@@ -28,66 +40,66 @@ jobs:
         run: |
           curl  https://get.acme.sh | sh
       - uses: actions/checkout@v3
-      # - name: Create xuexb SSL
-      #   run: |
-      #     mkdir -p ./ca/xuexb
-      #     $ACME --issue \
-      #       --server letsencrypt \
-      #       --dns dns_ali \
-      #       --log \
-      #       -d "xuexb.com" \
-      #       -d "xuexb.cn" \
-      #       -d "*.xuexb.cn" \
-      #       -d "*.xuexb.com" \
-      #       -d "*.static.xuexb.com" \
-      #       -d "*.dev.xuexb.com" \
-      #       -d "*.proxy.xuexb.com" \
-      #       -d "*.api.xuexb.com"
-      #     $ACME --installcert \
-      #       -d "xuexb.com" \
-      #       --key-file ./ca/xuexb/xuexb.key \
-      #       --fullchain-file ./ca/xuexb/xuexb.cer
-      # - name: Create jiandansousuo SSL
-      #   run: |
-      #     mkdir -p ./ca/jiandansousuo
-      #     $ACME --issue \
-      #       --server letsencrypt \
-      #       --dns dns_ali \
-      #       --log \
-      #       -d "jiandansousuo.com" \
-      #       -d "jiandansousuo.cn" \
-      #       -d "*.jiandansousuo.cn" \
-      #       -d "*.jiandansousuo.com"
-      #     $ACME --installcert \
-      #       -d "jiandansousuo.com" \
-      #       --key-file ./ca/jiandansousuo/jiandansousuo.key \
-      #       --fullchain-file ./ca/jiandansousuo/jiandansousuo.cer
-      # - name: Create xiaowu SSL
-      #   run: |
-      #     mkdir -p ./ca/xiaowu
-      #     $ACME --issue \
-      #       --server letsencrypt \
-      #       --dns dns_namecom \
-      #       --log \
-      #       -d "xiaowu.dev" \
-      #       -d "*.xiaowu.dev" \
-      #       -d "jiandansousuo.org" \
-      #       -d "*.jiandansousuo.org" \
-      #       -d "apijs.org" \
-      #       -d "*.apijs.org" \
-      #       -d "kakawoniu.com" \
-      #       -d "*.kakawoniu.com" \
-      #       -d "shangxian.app" \
-      #       -d "*.shangxian.app" \
-      #       -d "xiaoshuo.io" \
-      #       -d "*.xiaoshuo.io"
-      #     $ACME --installcert \
-      #       -d "xiaowu.dev" \
-      #       --key-file ./ca/xiaowu/xiaowu.key \
-      #       --fullchain-file ./ca/xiaowu/xiaowu.cer
-      - name: Test
+      - name: Create xuexb SSL
+        if: ${{ env.CA_NAME == "all" || env.CA_NAME == "xuexb" }}
         run: |
-          echo >> README.md
+          mkdir -p ./ca/xuexb
+          $ACME --issue \
+            --server letsencrypt \
+            --dns dns_ali \
+            --log \
+            -d "xuexb.com" \
+            -d "xuexb.cn" \
+            -d "*.xuexb.cn" \
+            -d "*.xuexb.com" \
+            -d "*.static.xuexb.com" \
+            -d "*.dev.xuexb.com" \
+            -d "*.proxy.xuexb.com" \
+            -d "*.api.xuexb.com"
+          $ACME --installcert \
+            -d "xuexb.com" \
+            --key-file ./ca/xuexb/xuexb.key \
+            --fullchain-file ./ca/xuexb/xuexb.cer
+      - name: Create jiandansousuo SSL
+        if: ${{ env.CA_NAME == "all" || env.CA_NAME == "jiandansousuo" }}
+        run: |
+          mkdir -p ./ca/jiandansousuo
+          $ACME --issue \
+            --server letsencrypt \
+            --dns dns_ali \
+            --log \
+            -d "jiandansousuo.com" \
+            -d "jiandansousuo.cn" \
+            -d "*.jiandansousuo.cn" \
+            -d "*.jiandansousuo.com"
+          $ACME --installcert \
+            -d "jiandansousuo.com" \
+            --key-file ./ca/jiandansousuo/jiandansousuo.key \
+            --fullchain-file ./ca/jiandansousuo/jiandansousuo.cer
+      - name: Create xiaowu SSL
+        if: ${{ env.CA_NAME == "all" || env.CA_NAME == "xiaowu" }}
+        run: |
+          mkdir -p ./ca/xiaowu
+          $ACME --issue \
+            --server letsencrypt \
+            --dns dns_namecom \
+            --log \
+            -d "xiaowu.dev" \
+            -d "*.xiaowu.dev" \
+            -d "jiandansousuo.org" \
+            -d "*.jiandansousuo.org" \
+            -d "apijs.org" \
+            -d "*.apijs.org" \
+            -d "kakawoniu.com" \
+            -d "*.kakawoniu.com" \
+            -d "shangxian.app" \
+            -d "*.shangxian.app" \
+            -d "xiaoshuo.io" \
+            -d "*.xiaoshuo.io"
+          $ACME --installcert \
+            -d "xiaowu.dev" \
+            --key-file ./ca/xiaowu/xiaowu.key \
+            --fullchain-file ./ca/xiaowu/xiaowu.cer
       - name: Git push
         run: |
           git config user.name xuexb
