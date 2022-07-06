@@ -42,7 +42,7 @@ jobs:
           curl  https://get.acme.sh | sh
       - uses: actions/checkout@v3
       - name: Create xuexb SSL
-        if: ${{ env.CA_NAME == 'all' || env.CA_NAME == 'xuexb' }}
+        if: ${{ env.CA_NAME == 'all' || startsWith(env.CA_NAME, 'xuexb') }}
         run: |
           mkdir -p ./ca/xuexb
           $ACME --issue \
@@ -62,7 +62,7 @@ jobs:
             --key-file ./ca/xuexb/xuexb.key \
             --fullchain-file ./ca/xuexb/xuexb.cer
       - name: Create jiandansousuo SSL
-        if: ${{ env.CA_NAME == 'all' || env.CA_NAME == 'jiandansousuo' }}
+        if: ${{ env.CA_NAME == 'all' || startsWith(env.CA_NAME, 'jiandansousuo') }}
         run: |
           mkdir -p ./ca/jiandansousuo
           $ACME --issue \
@@ -78,7 +78,7 @@ jobs:
             --key-file ./ca/jiandansousuo/jiandansousuo.key \
             --fullchain-file ./ca/jiandansousuo/jiandansousuo.cer
       - name: Create xiaowu SSL
-        if: ${{ env.CA_NAME == 'all' || env.CA_NAME == 'xiaowu' }}
+        if: ${{ env.CA_NAME == 'all' || startsWith(env.CA_NAME, 'xiaowu') }}
         run: |
           mkdir -p ./ca/xiaowu
           $ACME --issue \
@@ -102,6 +102,7 @@ jobs:
             --key-file ./ca/xiaowu/xiaowu.key \
             --fullchain-file ./ca/xiaowu/xiaowu.cer
       - name: Git push
+        if: ${{ success() }}
         run: |
           git config user.name xuexb
           git config user.email fe.xiaowu@gmail.com
