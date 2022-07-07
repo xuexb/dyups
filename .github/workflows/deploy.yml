@@ -11,24 +11,6 @@ on:
         description: '部署版本'
         default: 'master'
         type: string
-    secrets:
-      SSH_HOST_DEV:
-      SSH_USERNAME_DEV:
-      SSH_KEY_DEV:
-      SSH_PORT_DEV:
-      SSH_HOST_PRD:
-      SSH_USERNAME_PRD:
-      SSH_KEY_PRD:
-      SSH_PORT_PRD:
-      GHCR_ACCESS_TOKEN:
-      DYUPS_TOKEN:
-      DYUPS_DB_HOST:
-      DYUPS_DB_PORT:
-      DYUPS_DB_DATABASE:
-      DYUPS_DB_USER:
-      DYUPS_DB_PASSWORD:
-      DYUPS_DB_CHARSET:
-      GHCR_MIRROR:
 
 env:
   IMAGE_VERSION: ${{ inputs.version || github.event.inputs.version }}
@@ -38,7 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Generate Token
-        id: generate_token
         run: |
           echo ${{ env.IMAGE_VERSION }}
           echo ${{ inputs.version }}
