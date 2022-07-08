@@ -90,47 +90,32 @@ jobs:
             echo "curl https://ghcr.io/v2/${{ env.REPO }}/manifests/${{ env.IMAGE_VERSION }} Response => $HTTP_CODE"
             exit 1
           fi
-  set-env:
+
+  deploy:
     runs-on: ubuntu-latest
     needs: check-version
     if: ${{ needs.check-version.outputs.result == '200' }}
-    outputs:
-      ssh_host: ${{ steps.set-ssh-env.outputs.ssh_host }}
-      sshhost: ${{ steps.set-ssh-env.outputs.sshhost }}
-      test: ${{ steps.set-ssh-env.outputs.test }}
-      ssh_host2: ${{ steps.set_ssh_env.outputs.ssh_host2 }}
-      sshhost2: ${{ steps.set_ssh_env.outputs.sshhost2 }}
-      test2: ${{ steps.set_ssh_env.outputs.test }}
     steps:
-      - name: set-ssh-env
-        id: set_ssh_env
+      - name: set env
         run: |
           if [ "${{ env.ENV_NAME }}" == "dev" ]; then
-            echo "ssh_host dev = ${{ secrets.SSH_HOST_DEV }}"
-            echo "::set-output name=ssh_host::${{ secrets.SSH_HOST_DEV }}"
-            echo "::set-output name=sshhost::${{ secrets.SSH_HOST_DEV }}"
-            echo "::set-output name=test::okkkk"
-            echo "::set-output name=ssh_host2::${{ secrets.SSH_HOST_DEV }}"
-            echo "::set-output name=sshhost2::${{ secrets.SSH_HOST_DEV }}"
-            echo "::set-output name=test2::okkkk"
+            echo "SSH_HOST=${{ secrets.SSH_HOST_DEV }}" >> $GITHUB_ENV
+            echo "SSH_KEY=${{ secrets.SSH_KEY_DEV }}" >> $GITHUB_ENV
+            echo "SSH_USERNAME=${{ secrets.SSH_USERNAME_DEV }}" >> $GITHUB_ENV
+            echo "SSH_PORT=${{ secrets.SSH_PORT_DEV }}" >> $GITHUB_ENV
           else
-            echo "ssh_host prd = ${{ secrets.SSH_HOST_PRD }}"
-            echo "::set-output name=ssh_host::${{ secrets.SSH_HOST_PRD }}"
+            echo "SSH_HOST=${{ secrets.SSH_HOST_PRD }}" >> $GITHUB_ENV
+            echo "SSH_KEY=${{ secrets.SSH_KEY_PRD }}" >> $GITHUB_ENV
+            echo "SSH_USERNAME=${{ secrets.SSH_USERNAME_PRD }}" >> $GITHUB_ENV
+            echo "SSH_PORT=${{ secrets.SSH_PORT_PRD }}" >> $GITHUB_ENV
           fi
-  deploy:
-    runs-on: ubuntu-latest
-    needs: [set-env, check-version]
-    if: |
-      needs.check-version.outputs.result == '200'
-      && (inputs.envname == 'dev' || github.event.inputs.envname == 'dev')
-    steps:
       - name: Deploy
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_HOST_DEV }}
-          username: ${{ secrets.SSH_USERNAME_DEV }}
-          key: ${{ secrets.SSH_KEY_DEV }}
-          port: ${{ secrets.SSH_PORT_DEV }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
           debug: true
           command_timeout: 30m
           script: |
@@ -155,24 +140,32 @@ jobs:
     needs: [deploy, set-env]
     if: ${{ needs.deploy.result == 'success' }}
     steps:
-      - name: dump env
+      - name: set env
         run: |
-          echo "ssh_host = ${{ needs.set-env.outputs.ssh_host }}"
-          echo "sshhost = ${{ needs.set-env.outputs.sshhost }}"
-          echo "test = ${{ needs.set-env.outputs.test }}"
-          echo "ssh_host2 = ${{ needs.set-env.outputs.ssh_host2 }}"
-          echo "sshhost2 = ${{ needs.set-env.outputs.sshhost2 }}"
-          echo "test2 = ${{ needs.set-env.outputs.test2 }}"
+          if [ "${{ env.ENV_NAME }}" == "dev" ]; then
+            echo "SSH_HOST=${{ secrets.SSH_HOST_DEV }}" >> $GITHUB_ENV
+            echo "SSH_KEY=${{ secrets.SSH_KEY_DEV }}" >> $GITHUB_ENV
+            echo "SSH_USERNAME=${{ secrets.SSH_USERNAME_DEV }}" >> $GITHUB_ENV
+            echo "SSH_PORT=${{ secrets.SSH_PORT_DEV }}" >> $GITHUB_ENV
+          else
+            echo "SSH_HOST=${{ secrets.SSH_HOST_PRD }}" >> $GITHUB_ENV
+            echo "SSH_KEY=${{ secrets.SSH_KEY_PRD }}" >> $GITHUB_ENV
+            echo "SSH_USERNAME=${{ secrets.SSH_USERNAME_PRD }}" >> $GITHUB_ENV
+            echo "SSH_PORT=${{ secrets.SSH_PORT_PRD }}" >> $GITHUB_ENV
+          fi
       - name: Test
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_HOST_DEV }}
-          username: ${{ secrets.SSH_USERNAME_DEV }}
-          key: ${{ secrets.SSH_KEY_DEV }}
-          port: ${{ secrets.SSH_PORT_DEV }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
           debug: true
           command_timeout: 30m
           script: |
             if [ "$(curl -sL -w '%{http_code}' -H 'host: dyups' -H 'x-dyups-token: ${{ secrets.DYUPS_TOKEN }}' --connect-timeout 3 127.0.0.1/api/reload?r=$RANDOM -o /dev/null)" != "200" ]; then
+              exit 1
+            fi
+            if [ "$(curl -sL -w '%{http_code}' -H 'host: dyups' --connect-timeout 3 127.0.0.1/api/reload?r=$RANDOM -o /dev/null)" != "403" ]; then
               exit 1
             fi
