@@ -12,22 +12,39 @@ on:
         type: string
     secrets:
       SSH_HOST_DEV:
+        required: true
       SSH_USERNAME_DEV:
+        required: true
       SSH_KEY_DEV:
+        required: true
       SSH_PORT_DEV:
+        required: true
       SSH_HOST_PRD:
+        required: true
       SSH_USERNAME_PRD:
+        required: true
       SSH_KEY_PRD:
+        required: true
       SSH_PORT_PRD:
+        required: true
       GHCR_ACCESS_TOKEN:
+        required: true
       DYUPS_TOKEN:
+        required: true
       DYUPS_DB_HOST:
+        required: true
       DYUPS_DB_PORT:
+        required: true
       DYUPS_DB_DATABASE:
+        required: true
       DYUPS_DB_USER:
+        required: true
       DYUPS_DB_PASSWORD:
+        required: true
       DYUPS_DB_CHARSET:
+        required: true
       GHCR_MIRROR:
+        required: true
   workflow_dispatch:
     inputs:
       envname:
@@ -72,7 +89,7 @@ jobs:
             echo "curl https://ghcr.io/v2/${{ env.REPO }}/manifests/${{ env.IMAGE_VERSION }} Response => $HTTP_CODE"
             exit 1
           fi
-  deploy-dev:
+  deploy:
     runs-on: ubuntu-latest
     needs: check-version
     if: |
@@ -105,23 +122,10 @@ jobs:
                 --env "DYUPS_DB_PASSWORD=${{ secrets.DYUPS_DB_PASSWORD }}" \
                 --env "DYUPS_DB_CHARSET=${{ secrets.DYUPS_DB_CHARSET }}" \
                 ${{ env.MIRROR_REPOSITORY_TAG }}
-      - name: Test
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST_DEV }}
-          username: ${{ secrets.SSH_USERNAME_DEV }}
-          key: ${{ secrets.SSH_KEY_DEV }}
-          port: ${{ secrets.SSH_PORT_DEV }}
-          debug: true
-          command_timeout: 30m
-          script: |
-            if [ "$(curl -sL -w '%{http_code}' -H 'host: dyups' -H 'x-dyups-token: ${{ secrets.DYUPS_TOKEN }}' --connect-timeout 3 127.0.0.1/api/reload?r=$RANDOM -o /dev/null)" != "200" ]; then
-              exit 1
-            fi
-  test-dev:
+  test:
     runs-on: ubuntu-latest
-    needs: deploy-dev
-    if: ${{ needs.deploy-dev.result == 'success' }}
+    needs: deploy
+    if: ${{ needs.deploy.result == 'success' }}
     steps:
       - name: Test
         uses: appleboy/ssh-action@master
