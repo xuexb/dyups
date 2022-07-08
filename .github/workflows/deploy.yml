@@ -98,8 +98,8 @@ jobs:
       ssh_host: ${{ steps.set-ssh-env.outputs.ssh_host }}
       sshhost: ${{ steps.set-ssh-env.outputs.sshhost }}
       test: ${{ steps.set-ssh-env.outputs.test }}
-      ssh_host2: ${{ steps.set_ssh_env.outputs.ssh_host }}
-      sshhost2: ${{ steps.set_ssh_env.outputs.sshhost }}
+      ssh_host2: ${{ steps.set_ssh_env.outputs.ssh_host2 }}
+      sshhost2: ${{ steps.set_ssh_env.outputs.sshhost2 }}
       test2: ${{ steps.set_ssh_env.outputs.test }}
     steps:
       - name: set-ssh-env
