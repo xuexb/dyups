@@ -96,12 +96,23 @@ jobs:
     if: ${{ needs.check-version.outputs.result == '200' }}
     outputs:
       ssh_host: ${{ steps.set-ssh-env.outputs.ssh_host }}
+      sshhost: ${{ steps.set-ssh-env.outputs.sshhost }}
+      test: ${{ steps.set-ssh-env.outputs.test }}
+      ssh_host2: ${{ steps.set_ssh_env.outputs.ssh_host }}
+      sshhost2: ${{ steps.set_ssh_env.outputs.sshhost }}
+      test2: ${{ steps.set_ssh_env.outputs.test }}
     steps:
       - name: set-ssh-env
+        id: set_ssh_env
         run: |
           if [ "${{ env.ENV_NAME }}" == "dev" ]; then
             echo "ssh_host dev = ${{ secrets.SSH_HOST_DEV }}"
             echo "::set-output name=ssh_host::${{ secrets.SSH_HOST_DEV }}"
+            echo "::set-output name=sshhost::${{ secrets.SSH_HOST_DEV }}"
+            echo "::set-output name=test::okkkk"
+            echo "::set-output name=ssh_host2::${{ secrets.SSH_HOST_DEV }}"
+            echo "::set-output name=sshhost2::${{ secrets.SSH_HOST_DEV }}"
+            echo "::set-output name=test2::okkkk"
           else
             echo "ssh_host prd = ${{ secrets.SSH_HOST_PRD }}"
             echo "::set-output name=ssh_host::${{ secrets.SSH_HOST_PRD }}"
@@ -147,6 +158,11 @@ jobs:
       - name: dump env
         run: |
           echo "ssh_host = ${{ needs.set-env.outputs.ssh_host }}"
+          echo "sshhost = ${{ needs.set-env.outputs.sshhost }}"
+          echo "test = ${{ needs.set-env.outputs.test }}"
+          echo "ssh_host2 = ${{ needs.set-env.outputs.ssh_host2 }}"
+          echo "sshhost2 = ${{ needs.set-env.outputs.sshhost2 }}"
+          echo "test2 = ${{ needs.set-env.outputs.test2 }}"
       - name: Test
         uses: appleboy/ssh-action@master
         with:
