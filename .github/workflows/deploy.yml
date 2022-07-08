@@ -94,14 +94,15 @@ jobs:
     runs-on: ubuntu-latest
     needs: check-version
     if: ${{ needs.check-version.outputs.result == '200' }}
+    outputs:
+      SSH_HOST: ${{ steps.set-ssh-env.outputs.SSH_HOST }}
     steps:
       - name: set-ssh-env
         run: |
-          echo "env = ${{ env.ENV_NAME }}"
           if [ "${{ env.ENV_NAME }}" == "dev" ]; then
-            echo "SSH_HOST=${{ secrets.SSH_HOST_DEV }}" >> $GITHUB_ENV
+            echo "::set-output name=SSH_HOST::${{ secrets.SSH_HOST_DEV }}"
           else
-            echo "SSH_HOST=${{ secrets.SSH_HOST_PRD }}" >> $GITHUB_ENV
+            echo "::set-output name=SSH_HOST::${{ secrets.SSH_HOST_PRD }}"
           fi
   deploy:
     runs-on: ubuntu-latest
@@ -138,12 +139,12 @@ jobs:
                 ${{ env.MIRROR_REPOSITORY_TAG }}
   test:
     runs-on: ubuntu-latest
-    needs: deploy
+    needs: [deploy, set-env]
     if: ${{ needs.deploy.result == 'success' }}
     steps:
       - name: dump env
         run: |
-          echo "SSH_HOST = ${{ env.SSH_HOST }}"
+          echo "SSH_HOST = ${{ needs.set-env.outputs.SSH_HOST }}"
       - name: Test
         uses: appleboy/ssh-action@master
         with:
