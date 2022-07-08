@@ -100,12 +100,16 @@ jobs:
         run: |
           if [ "${{ env.ENV_NAME }}" == "dev" ]; then
             echo "SSH_HOST=${{ secrets.SSH_HOST_DEV }}" >> $GITHUB_ENV
-            echo "SSH_KEY=${{ secrets.SSH_KEY_DEV }}" >> $GITHUB_ENV
+            echo 'SSH_KEY<<EOF' >> $GITHUB_ENV
+            echo "${{ secrets.SSH_KEY_DEV }}" >> $GITHUB_ENV
+            echo 'EOF' >> $GITHUB_ENV
             echo "SSH_USERNAME=${{ secrets.SSH_USERNAME_DEV }}" >> $GITHUB_ENV
             echo "SSH_PORT=${{ secrets.SSH_PORT_DEV }}" >> $GITHUB_ENV
           else
             echo "SSH_HOST=${{ secrets.SSH_HOST_PRD }}" >> $GITHUB_ENV
-            echo "SSH_KEY=${{ secrets.SSH_KEY_PRD }}" >> $GITHUB_ENV
+            echo 'SSH_KEY<<EOF' >> $GITHUB_ENV
+            echo "${{ secrets.SSH_KEY_PRD }}" >> $GITHUB_ENV
+            echo 'EOF' >> $GITHUB_ENV
             echo "SSH_USERNAME=${{ secrets.SSH_USERNAME_PRD }}" >> $GITHUB_ENV
             echo "SSH_PORT=${{ secrets.SSH_PORT_PRD }}" >> $GITHUB_ENV
           fi
@@ -144,12 +148,16 @@ jobs:
         run: |
           if [ "${{ env.ENV_NAME }}" == "dev" ]; then
             echo "SSH_HOST=${{ secrets.SSH_HOST_DEV }}" >> $GITHUB_ENV
-            echo "SSH_KEY=${{ secrets.SSH_KEY_DEV }}" >> $GITHUB_ENV
+            echo 'SSH_KEY<<EOF' >> $GITHUB_ENV
+            echo "${{ secrets.SSH_KEY_DEV }}" >> $GITHUB_ENV
+            echo 'EOF' >> $GITHUB_ENV
             echo "SSH_USERNAME=${{ secrets.SSH_USERNAME_DEV }}" >> $GITHUB_ENV
             echo "SSH_PORT=${{ secrets.SSH_PORT_DEV }}" >> $GITHUB_ENV
           else
             echo "SSH_HOST=${{ secrets.SSH_HOST_PRD }}" >> $GITHUB_ENV
-            echo "SSH_KEY=${{ secrets.SSH_KEY_PRD }}" >> $GITHUB_ENV
+            echo 'SSH_KEY<<EOF' >> $GITHUB_ENV
+            echo "${{ secrets.SSH_KEY_PRD }}" >> $GITHUB_ENV
+            echo 'EOF' >> $GITHUB_ENV
             echo "SSH_USERNAME=${{ secrets.SSH_USERNAME_PRD }}" >> $GITHUB_ENV
             echo "SSH_PORT=${{ secrets.SSH_PORT_PRD }}" >> $GITHUB_ENV
           fi
