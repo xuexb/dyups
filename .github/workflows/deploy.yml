@@ -95,14 +95,16 @@ jobs:
     needs: check-version
     if: ${{ needs.check-version.outputs.result == '200' }}
     outputs:
-      SSH_HOST: ${{ steps.set-ssh-env.outputs.SSH_HOST }}
+      ssh_host: ${{ steps.set-ssh-env.outputs.ssh_host }}
     steps:
       - name: set-ssh-env
         run: |
           if [ "${{ env.ENV_NAME }}" == "dev" ]; then
-            echo "::set-output name=SSH_HOST::${{ secrets.SSH_HOST_DEV }}"
+            echo "ssh_host dev = ${{ secrets.SSH_HOST_DEV }}"
+            echo "::set-output name=ssh_host::${{ secrets.SSH_HOST_DEV }}"
           else
-            echo "::set-output name=SSH_HOST::${{ secrets.SSH_HOST_PRD }}"
+            echo "ssh_host prd = ${{ secrets.SSH_HOST_PRD }}"
+            echo "::set-output name=ssh_host::${{ secrets.SSH_HOST_PRD }}"
           fi
   deploy:
     runs-on: ubuntu-latest
@@ -144,7 +146,7 @@ jobs:
     steps:
       - name: dump env
         run: |
-          echo "SSH_HOST = ${{ needs.set-env.outputs.SSH_HOST }}"
+          echo "ssh_host = ${{ needs.set-env.outputs.ssh_host }}"
       - name: Test
         uses: appleboy/ssh-action@master
         with:
