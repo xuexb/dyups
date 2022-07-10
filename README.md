@@ -10,9 +10,17 @@
 - [x] Upstream 动态加载
 - [x] Upstream 负载均衡
 - [x] Token 鉴权
-  - [x] Cookie
-  - [x] GET param
-  - [x] Request Header
+    - Cookie
+    - GET param
+    - Request Header
+- [x] 响应 Headers
+    - `x-dyups-target` - 当前响应服务的目标地址（IP+端口）
+- [x] 向上游应用服务透传 Headers
+    - `host` - `127.0.0.1` ，用于破解备案限制
+    - `x-dyups` - `true`
+    - `x-dyups-host` - 用户真实 Host
+    - `x-dyups-scheme` - 用户访问的协议
+    - `x-dyups-ip` - 用户真实 IP
 
 ## API
 
