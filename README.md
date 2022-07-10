@@ -1,6 +1,18 @@
 # dyups
 
-前端小武动态化站点配置
+前端小武动态化转发服务，配合泛域名可轻松部署一个独立域名服务。
+
+## Features
+
+- [x] MySQL 数据持久化
+- [x] Agent 同步
+- [x] 多机部署
+- [x] Upstream 动态加载
+- [x] Upstream 负载均衡
+- [x] Token 鉴权
+  - [x] Cookie
+  - [x] GET param
+  - [x] Request Header
 
 ## API
 
