@@ -10,7 +10,7 @@ _M.DYUPS_DB_PORT = os.getenv("DYUPS_DB_PORT")
 _M.DYUPS_DB_DATABASE = os.getenv("DYUPS_DB_DATABASE")
 _M.DYUPS_DB_USER = os.getenv("DYUPS_DB_USER")
 _M.DYUPS_DB_PASSWORD = os.getenv("DYUPS_DB_PASSWORD")
-_M.DYUPS_DB_CHARSET = os.getenv("")
+_M.DYUPS_DB_CHARSET = os.getenv("DYUPS_DB_CHARSET")
 
 _M._VERSION = "0.1"
 
