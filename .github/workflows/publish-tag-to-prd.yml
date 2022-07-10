@@ -39,3 +39,10 @@ jobs:
           context: .
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+  depoly:
+    needs: build-and-push-image
+    runs-on: ubuntu-latest
+    steps:
+      - name: dump
+        run: |
+          echo "version = ${{ needs.build-and-push-image.outputs.version }}"
