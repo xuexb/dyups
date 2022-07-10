@@ -16,7 +16,7 @@ services:
       - ./vhost:/etc/nginx/vhost
       - ./nginx.conf:/etc/nginx/nginx.conf
     environment:
-      DYUPS_TOKEN: OK
+      DYUPS_TOKEN: KPlxQHExYQGMAwtepoYi
       DYUPS_DB_HOST: 8.141.208.241
       DYUPS_DB_PORT: 3306
       DYUPS_DB_DATABASE: xiaowudev_dyups

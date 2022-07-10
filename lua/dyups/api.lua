@@ -1,6 +1,7 @@
 local mysql = require("resty.mysql")
 local ltn12 = require("ltn12")
 local cjson = require("cjson")
+local httpc = require("resty.http").new()
 
 local _M = {};
 
@@ -128,6 +129,37 @@ function _M:reload()
         ngx.shared.upstream_list:set(v.domain, cjson.encode(v.server))
     end
     return true
+end
+
+function _M:sync()
+    local db = _M:connect();
+    if not db then
+        return nil
+    end
+    local sql = "select address, remark from agent"
+    local res, err, errno, sqlstate = db:query(sql)
+    _M:close(db)
+
+    if not res then
+        return nil
+    end
+
+    local result = {}
+    for k, v in ipairs(res) do
+        local data, err = httpc:request_uri('http://' .. v.address .. "/api/reload", {
+            method = "GET",
+            headers = {
+                ["x-dyups-token"] = os.getenv("DYUPS_TOKEN"),
+                ["host"] = "dyups"
+            }
+        })
+        if not data or data.status ~= 200 then
+            result[v.remark] = data and data.status or err
+        else
+            result[v.remark] = "OK"
+        end
+    end
+    return result
 end
 
 function _M:get(domain)
