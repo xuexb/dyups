@@ -107,7 +107,7 @@ jobs:
           git config user.name xuexb
           git config user.email fe.xiaowu@gmail.com
           git add .
-          git commit -m "feat: Add SSL"
+          git commit -m "feat: Add SSL - ${{ env.CA_NAME }}"
           git push
           git tag "ssl-$(date "+%Y%m%d")"
           git push --tags
