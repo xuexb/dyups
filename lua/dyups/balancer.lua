@@ -2,7 +2,8 @@ local balancer = require("ngx.balancer")
 local dyups = require("dyups.api")
 
 local upstreams = ngx.ctx.upstreams
-local current = nil
+
+ngx.ctx.current = nil
 
 local function getKey(upstream)
     return upstream.address .. ":" .. upstream.port
@@ -17,16 +18,16 @@ if not ngx.ctx.retry then
     ngx.ctx.retry = true
     ngx.ctx.tried = {}
 
-    current = upstreams[math.random(#upstreams)]
+    ngx.ctx.current = upstreams[math.random(#upstreams)]
 
-    ngx.ctx.tried[getKey(current)] = true
+    ngx.ctx.tried[getKey(ngx.ctx.current)] = true
 else
     for k, upstream in pairs(upstreams) do
         local key = getKey(upstream)
         local in_ctx = ngx.ctx.tried[key] ~= nil
         if in_ctx == false then
             ngx.ctx.tried[key] = true
-            current = upstream
+            ngx.ctx.current = upstream
             break
         end
     end
@@ -34,7 +35,7 @@ end
 
 balancer.set_timeouts(2, nil, nil)
 
-local ok, err = balancer.set_current_peer(current.address, current.port)
+local ok, err = balancer.set_current_peer(ngx.ctx.current.address, ngx.ctx.current.port)
 if not ok then
     ngx.log(ngx.ERR, "set_current_peer failed: ", err)
     return ngx.exit(502)
