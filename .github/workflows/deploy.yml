@@ -8,7 +8,7 @@ on:
         type: string
       version:
         description: '部署版本'
-        default: 'master'
+        default: 'latest'
         type: string
     secrets:
       SSH_HOST_DEV:
@@ -56,7 +56,7 @@ on:
           - prd
       version:
         description: '部署版本'
-        default: 'master'
+        default: 'latest'
         type: string
 
 env:
