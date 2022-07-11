@@ -4,7 +4,7 @@ on:
     inputs:
       envname:
         description: '部署环境'
-        default: 'dev'
+        default: 'test'
         type: string
       version:
         description: '部署版本'
@@ -49,10 +49,10 @@ on:
     inputs:
       envname:
         description: '部署环境'
-        default: 'dev'
+        default: 'test'
         type: choice
         options:
-          - dev
+          - test
           - prd
       version:
         description: '部署版本'
@@ -98,7 +98,7 @@ jobs:
     steps:
       - name: set env
         run: |
-          if [ "${{ env.ENV_NAME }}" == "dev" ]; then
+          if [ "${{ env.ENV_NAME }}" == "test" ]; then
             echo "SSH_HOST=${{ secrets.SSH_HOST_DEV }}" >> $GITHUB_ENV
             echo 'SSH_KEY<<EOF' >> $GITHUB_ENV
             echo "${{ secrets.SSH_KEY_DEV }}" >> $GITHUB_ENV
@@ -146,7 +146,7 @@ jobs:
     steps:
       - name: set env
         run: |
-          if [ "${{ env.ENV_NAME }}" == "dev" ]; then
+          if [ "${{ env.ENV_NAME }}" == "test" ]; then
             echo "SSH_HOST=${{ secrets.SSH_HOST_DEV }}" >> $GITHUB_ENV
             echo 'SSH_KEY<<EOF' >> $GITHUB_ENV
             echo "${{ secrets.SSH_KEY_DEV }}" >> $GITHUB_ENV
