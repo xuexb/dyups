@@ -2,7 +2,7 @@ name: Test cron
 
 on:
   schedule:
-    - cron: '20 6 * * *'
+    - cron: '26 12 * * *'
 
 jobs:
   check-version:
@@ -14,10 +14,17 @@ jobs:
             echo ${{ github.event.schedule }}
       - uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.WORKFLOW_TOKEN }}
           script: |
-            github.rest.actions.createWorkflowDispatch({
+            try {
+              const result = github.rest.actions.createWorkflowDispatch({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 workflow_id: "publish.yml",
                 ref: "master",
-            });
+              });
+              console.log(result);
+            } catch(error) {
+              console.error(error);
+              core.setFailed(error);
+            }
