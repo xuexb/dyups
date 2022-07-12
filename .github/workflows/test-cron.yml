@@ -1,0 +1,23 @@
+name: Test cron
+
+on:
+  schedule:
+    - cron: '10 12 * * *'
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: test
+        run: |
+            echo "OK"
+            echo ${{ github.event.schedule }}
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: "publish.yml",
+                ref: "master",
+            });
