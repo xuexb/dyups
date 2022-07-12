@@ -13,18 +13,6 @@ on:
           - jiandansousuo (ali)
           - xiaowu (name)
 
-  workflow_call:
-    inputs:
-      caname:
-        description: '证书类别'
-        default: all
-        type: string
-    secrets:
-      ALI_KEY:
-      ALI_SECRET:
-      NAMECOM_TOKEN:
-      NAMECOM_USERNAME:
-
 env:
   CA_NAME: ${{ inputs.caname || github.event.inputs.caname }}
   ACME: /home/runner/.acme.sh/acme.sh
