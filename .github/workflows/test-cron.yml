@@ -2,7 +2,7 @@ name: Test cron
 
 on:
   schedule:
-    - cron: '10 6 * * *'
+    - cron: '20 6 * * *'
 
 jobs:
   check-version:
