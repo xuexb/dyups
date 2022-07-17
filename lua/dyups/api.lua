@@ -36,7 +36,7 @@ function _M:connect()
         return nil
     end
 
-    db:set_timeout(1000) -- 1 sec
+    db:set_timeout(3000) -- 3 sec
 
     local ok, err, errcode, sqlstate = db:connect{
         host = _M.DYUPS_DB_HOST,
