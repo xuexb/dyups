@@ -1,7 +1,7 @@
 local mysql = require("resty.mysql")
 local ltn12 = require("ltn12")
 local cjson = require("cjson")
-local httpc = require("resty.http").new()
+local http = require("resty.http")
 
 local _M = {};
 
@@ -132,7 +132,7 @@ function _M:reload()
 end
 
 function _M:sync()
-    local db = _M:connect();
+    local db = _M:connect()
     if not db then
         return nil
     end
@@ -146,6 +146,11 @@ function _M:sync()
 
     local result = {}
     for k, v in ipairs(res) do
+        local httpc = http:new()
+        if not httpc then
+            result[v.remark] = "not httpc"
+            break
+        end
         local data, err = httpc:request_uri('http://' .. v.address .. "/api/reload", {
             method = "GET",
             headers = {
@@ -153,6 +158,7 @@ function _M:sync()
                 ["host"] = "dyups"
             }
         })
+        httpc:close()
         if not data or data.status ~= 200 then
             result[v.remark] = data and data.status or err
         else

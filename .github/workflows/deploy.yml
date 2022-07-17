@@ -6,10 +6,12 @@ on:
         description: '部署环境'
         default: 'test'
         type: string
+        required: false
       version:
         description: '部署版本'
         default: 'latest'
         type: string
+        required: false
     secrets:
       SSH_HOST_DEV:
         required: true
@@ -51,6 +53,7 @@ on:
         description: '部署环境'
         default: 'test'
         type: choice
+        required: false
         options:
           - test
           - prd
@@ -58,6 +61,7 @@ on:
         description: '部署版本'
         default: 'latest'
         type: string
+        required: false
 
 env:
   REPO: xuexb/dyups
