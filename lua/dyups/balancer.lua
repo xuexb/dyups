@@ -5,13 +5,21 @@ local upstreams = ngx.ctx.upstreams
 
 ngx.ctx.current = nil
 
+local function set_current_peer(data)
+    local ok, err = balancer.set_current_peer(data.address, data.port)
+    if not ok then
+        ngx.log(ngx.ERR, "set_current_peer failed: ", err)
+        return ngx.exit(500)
+    end
+end
+
 local function getKey(upstream)
     return upstream.address .. ":" .. upstream.port
 end
 
 if not upstreams then
-    ngx.log(ngx.ERR, "upstreams not found")
-    return ngx.exit(502)
+    ngx.log(ngx.ERR, "upstreams not found, set 502")
+    return set_current_peer({ address = "127.0.0.1", port = 502 })
 end
 
 if not ngx.ctx.retry then
@@ -26,6 +34,8 @@ if not ngx.ctx.retry then
     if not ok then
         ngx.log(ngx.ERR, "set_more_tries failed: ", err)
     end
+
+    balancer.set_timeouts(2, nil, nil)
 else
     for k, upstream in pairs(upstreams) do
         local key = getKey(upstream)
@@ -38,10 +48,9 @@ else
     end
 end
 
-balancer.set_timeouts(2, nil, nil)
-
-local ok, err = balancer.set_current_peer(ngx.ctx.current.address, ngx.ctx.current.port)
-if not ok then
-    ngx.log(ngx.ERR, "set_current_peer failed: ", err)
-    return ngx.exit(502)
+if ngx.ctx.current then
+    set_current_peer(ngx.ctx.current)
+else
+    ngx.log(ngx.ERR, "ngx.ctx.current is nil")
+    ngx.exit(500)
 end
