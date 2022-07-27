@@ -129,7 +129,7 @@ jobs:
           command_timeout: 30m
           script: |
             docker pull ${{ env.MIRROR_REPOSITORY_TAG }} \
-              && docker ps -aq --filter "name=${{ env.CONTAINER_NAME }}" | xargs docker rm -f || echo "Delete fail" \
+              && docker ps -aq --filter "name=^${{ env.CONTAINER_NAME }}$" | xargs docker rm -f || echo "Delete fail" \
               && docker run \
                 -p 80:80 \
                 -p 443:443 \
