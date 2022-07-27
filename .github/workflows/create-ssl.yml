@@ -9,6 +9,7 @@ on:
         description: '证书类别'
         default: all
         type: choice
+        required: false
         options:
           - all
           - xuexb (ali)
