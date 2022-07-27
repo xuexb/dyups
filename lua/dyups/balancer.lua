@@ -21,6 +21,11 @@ if not ngx.ctx.retry then
     ngx.ctx.current = upstreams[math.random(#upstreams)]
 
     ngx.ctx.tried[getKey(ngx.ctx.current)] = true
+
+    local ok, err = balancer.set_more_tries(#upstreams - 1)
+    if not ok then
+        ngx.log(ngx.ERR, "set_more_tries failed: ", err)
+    end
 else
     for k, upstream in pairs(upstreams) do
         local key = getKey(upstream)
@@ -39,9 +44,4 @@ local ok, err = balancer.set_current_peer(ngx.ctx.current.address, ngx.ctx.curre
 if not ok then
     ngx.log(ngx.ERR, "set_current_peer failed: ", err)
     return ngx.exit(502)
-end
-
-local ok, err = balancer.set_more_tries(#upstreams - 1)
-if not ok then
-    ngx.log(ngx.ERR, "set_more_tries failed: ", err)
 end
