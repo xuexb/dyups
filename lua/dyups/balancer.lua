@@ -26,23 +26,27 @@ if not ngx.ctx.retry then
     ngx.ctx.retry = true
     ngx.ctx.tried = {}
 
-    ngx.ctx.current = upstreams[math.random(#upstreams)]
+    ngx.ctx.current = upstreams.server[math.random(#upstreams.server)]
 
     ngx.ctx.tried[getKey(ngx.ctx.current)] = true
 
-    local ok, err = balancer.set_more_tries(#upstreams - 1)
+    local ok, err = balancer.set_more_tries(#upstreams.server - 1)
     if not ok then
         ngx.log(ngx.ERR, "set_more_tries failed: ", err)
     end
 
-    balancer.set_timeouts(2, nil, nil)
+    if upstreams.timeout and upstreams.timeout ~= 0 then
+        balancer.set_timeouts(upstreams.timeout, nil, nil)
+    else
+        balancer.set_timeouts(2, nil, nil)
+    end
 else
-    for k, upstream in pairs(upstreams) do
-        local key = getKey(upstream)
+    for k, server in pairs(upstreams.server) do
+        local key = getKey(server)
         local in_ctx = ngx.ctx.tried[key] ~= nil
         if in_ctx == false then
             ngx.ctx.tried[key] = true
-            ngx.ctx.current = upstream
+            ngx.ctx.current = server
             break
         end
     end

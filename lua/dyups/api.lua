@@ -72,7 +72,7 @@ end
 function _M:getAll()
     local db = _M:connect();
     if not db then return nil end
-    local sql = "select domain, server from upstream"
+    local sql = "select domain, server, timeout from upstream"
     local res, err, errno, sqlstate = db:query(sql)
     _M:close(db)
 
@@ -88,7 +88,7 @@ function _M:getByDomain(domain)
     if not db then
         return nil
     end
-    local sql = "select domain, server from upstream where domain = " .. ngx.quote_sql_str(domain) .. " limit 1"
+    local sql = "select domain, server, timeout from upstream where domain = " .. ngx.quote_sql_str(domain) .. " limit 1"
     local res, err, errno, sqlstate = db:query(sql)
     _M:close(db)
 
@@ -108,12 +108,12 @@ function _M:removeDomain(domain)
     return res
 end
 
-function _M:addDomain(domain, server)
+function _M:addDomain(domain, server, timeout)
     local db = _M:connect();
     if not db then
         return nil
     end
-    local sql = "INSERT INTO upstream (domain, server) VALUES (\'" .. domain .. "\', \'" .. server .. "\') ON DUPLICATE KEY UPDATE server=VALUES(server)"
+    local sql = "INSERT INTO upstream (domain, server, timeout) VALUES (\'" .. domain .. "\', \'" .. server .. "\', " .. timeout .. ") ON DUPLICATE KEY UPDATE server=VALUES(server), timeout=VALUES(timeout)"
     local res, err, errno, sqlstate = db:query(sql)
     _M:close(db)
     return res
@@ -126,7 +126,7 @@ function _M:reload()
     end
     local upstreams = {}
     for i, v in ipairs(data) do
-        ngx.shared.upstream_list:set(v.domain, cjson.encode(v.server))
+        ngx.shared.upstream_list:set(v.domain, cjson.encode(v))
     end
     return true
 end
