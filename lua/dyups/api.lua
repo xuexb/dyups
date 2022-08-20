@@ -124,6 +124,11 @@ function _M:reload()
     if not data then
         return nil
     end
+
+    -- 先清空缓存
+    ngx.shared.upstream_list:flush_all()
+    ngx.shared.upstream_list_dns:flush_all()
+
     local upstreams = {}
     for i, v in ipairs(data) do
         ngx.shared.upstream_list:set(v.domain, cjson.encode(v))
@@ -170,7 +175,17 @@ end
 
 function _M:get(domain)
     local data = ngx.shared.upstream_list:get(domain)
-    if not data then return nill end
+    if not data then
+        return nill
+    end
+    return cjson.decode(data)
+end
+
+function _M:getDNS(domain)
+    local data = ngx.shared.upstream_list_dns:get(domain)
+    if not data then
+        return nill
+    end
     return cjson.decode(data)
 end
 

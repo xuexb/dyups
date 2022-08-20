@@ -6,7 +6,12 @@ local upstreams = ngx.ctx.upstreams
 ngx.ctx.current = nil
 
 local function set_current_peer(data)
-    local ok, err = balancer.set_current_peer(data.address, data.port)
+    local ip = data.address
+    local port = data.port
+    if data.ip then
+        ip = data.ip
+    end
+    local ok, err = balancer.set_current_peer(ip, port)
     if not ok then
         ngx.log(ngx.ERR, "set_current_peer failed: ", err)
         return ngx.exit(500)
@@ -35,7 +40,7 @@ if not ngx.ctx.retry then
         ngx.log(ngx.ERR, "set_more_tries failed: ", err)
     end
 
-    if upstreams.timeout and upstreams.timeout ~= 0 then
+    if upstreams.timeout and upstreams.timeout ~= 0 and tostring(upstreams.timeout) ~= "userdata: NULL" then
         balancer.set_timeouts(upstreams.timeout, nil, nil)
     else
         balancer.set_timeouts(2, nil, nil)
