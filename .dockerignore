@@ -3,3 +3,5 @@ README.md
 .gitignore
 docker-compose.yml
 .dockerignore
+.github
+.editorconfig
