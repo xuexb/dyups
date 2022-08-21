@@ -28,7 +28,7 @@ elseif upstreams then
                 upstreams.server[index].ip = answers[#answers].address
             end
         end
-        ngx.shared.upstream_list_dns:set(domain, cjson.encode(upstreams))
+        ngx.shared.upstream_list_dns:set(domain, cjson.encode(upstreams), 60 * 60 * 24)
     end
     ngx.ctx.upstreams = upstreams
 end
