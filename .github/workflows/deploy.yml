@@ -89,12 +89,15 @@ jobs:
             echo "SSH_PORT=${{ secrets.SSH_PORT_PRD }}" >> $GITHUB_ENV
           fi
       - name: Deploy
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@dce9d565de8d876c11d93fa4fe677c0285a66d78
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
+          proxy_host: sg01.ddns.xuexb.com
+          proxy_username: duke
+          proxy_key: ${{ secrets.SSH_KEY }}
           command_timeout: 30m
           script: |
             docker pull ${{ env.MIRROR_REPOSITORY_TAG }} \
