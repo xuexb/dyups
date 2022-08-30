@@ -103,7 +103,6 @@ jobs:
               && docker run \
                 -p 80:80 \
                 -p 443:443 \
-                --rm \
                 -d \
                 --name "${{ env.CONTAINER_NAME }}" \
                 --env "DYUPS_TOKEN=${{ secrets.DYUPS_TOKEN }}" \
