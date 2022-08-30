@@ -97,7 +97,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           proxy_host: sg01.ddns.xuexb.com
           proxy_username: duke
-          proxy_key: ${{ secrets.SSH_KEY }}
+          proxy_key: ${{ secrets.PROXY_KEY }}
           command_timeout: 30m
           script: |
             docker pull ${{ env.MIRROR_REPOSITORY_TAG }} \
