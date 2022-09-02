@@ -49,7 +49,7 @@ jobs:
     needs: build-and-push-image
     if: ${{ needs.build-and-push-image.result == 'success' }}
     steps:
-      - uses: ./.github/actions/deploy.yml
+      - uses: ./.github/actions/deploy/
         with:
           version: ${{ needs.build-and-push-image.outputs.version }}
           ssh-host: ${{ secrets.SSH_HOST }}
@@ -75,7 +75,7 @@ jobs:
     needs: [depoly-gz, build-and-push-image]
     if: ${{ needs.depoly-gz.result == 'success' }}
     steps:
-      - uses: ./.github/actions/deploy.yml
+      - uses: ./.github/actions/deploy/
         with:
           version: ${{ needs.build-and-push-image.outputs.version }}
           ssh-host: ${{ secrets.SSH_HOST }}
@@ -100,7 +100,7 @@ jobs:
     needs: [depoly-sg, build-and-push-image]
     if: ${{ needs.depoly-sg.result == 'success' }}
     steps:
-      - uses: ./.github/actions/deploy.yml
+      - uses: ./.github/actions/deploy/
         with:
           version: ${{ needs.build-and-push-image.outputs.version }}
           ssh-host: ${{ secrets.SSH_HOST }}
