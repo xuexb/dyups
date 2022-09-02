@@ -2,32 +2,27 @@ name: Deploy
 on:
   workflow_call:
     inputs:
-      envname:
-        description: '部署环境'
-        default: 'test'
-        type: string
-        required: false
       version:
         description: '部署版本'
         default: 'latest'
         type: string
         required: false
     secrets:
-      SSH_HOST_DEV:
+      SSH_HOST:
         required: true
-      SSH_USERNAME_DEV:
+      SSH_USERNAME:
         required: true
-      SSH_KEY_DEV:
+      SSH_KEY:
         required: true
-      SSH_PORT_DEV:
+      SSH_PORT:
         required: true
-      SSH_HOST_PRD:
+      PROXY_HOST:
         required: true
-      SSH_USERNAME_PRD:
+      PROXY_USERNAME:
         required: true
-      SSH_KEY_PRD:
+      PROXY_KEY:
         required: true
-      SSH_PORT_PRD:
+      PROXY_PORT:
         required: true
       DYUPS_TOKEN:
         required: true
@@ -45,25 +40,8 @@ on:
         required: true
       GHCR_MIRROR:
         required: true
-  workflow_dispatch:
-    inputs:
-      envname:
-        description: '部署环境'
-        default: 'test'
-        type: choice
-        required: false
-        options:
-          - test
-          - prd
-      version:
-        description: '部署版本'
-        default: 'latest'
-        type: string
-        required: false
 
 env:
-  IMAGE_VERSION: ${{ inputs.version || github.event.inputs.version }}
-  ENV_NAME: ${{ inputs.envname || github.event.inputs.envname }}
   MIRROR_REPOSITORY_TAG: ${{ secrets.GHCR_MIRROR }}/xuexb/dyups:${{ inputs.version || github.event.inputs.version }}
   CONTAINER_NAME: dyups
 
@@ -71,23 +49,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: set env
-        run: |
-          if [ "${{ env.ENV_NAME }}" == "test" ]; then
-            echo "SSH_HOST=${{ secrets.SSH_HOST_DEV }}" >> $GITHUB_ENV
-            echo 'SSH_KEY<<EOF' >> $GITHUB_ENV
-            echo "${{ secrets.SSH_KEY_DEV }}" >> $GITHUB_ENV
-            echo 'EOF' >> $GITHUB_ENV
-            echo "SSH_USERNAME=${{ secrets.SSH_USERNAME_DEV }}" >> $GITHUB_ENV
-            echo "SSH_PORT=${{ secrets.SSH_PORT_DEV }}" >> $GITHUB_ENV
-          else
-            echo "SSH_HOST=${{ secrets.SSH_HOST_PRD }}" >> $GITHUB_ENV
-            echo 'SSH_KEY<<EOF' >> $GITHUB_ENV
-            echo "${{ secrets.SSH_KEY_PRD }}" >> $GITHUB_ENV
-            echo 'EOF' >> $GITHUB_ENV
-            echo "SSH_USERNAME=${{ secrets.SSH_USERNAME_PRD }}" >> $GITHUB_ENV
-            echo "SSH_PORT=${{ secrets.SSH_PORT_PRD }}" >> $GITHUB_ENV
-          fi
       - name: Deploy
         uses: appleboy/ssh-action@dce9d565de8d876c11d93fa4fe677c0285a66d78
         with:
@@ -95,9 +56,10 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          proxy_host: sg01.ddns.xuexb.com
-          proxy_username: duke
+          proxy_host: ${{ secrets.PROXY_HOST }}
+          proxy_username: ${{ secrets.PROXY_USERNAME }}
           proxy_key: ${{ secrets.PROXY_KEY }}
+          proxy_port: ${{ secrets.PROXY_PORT }}
           command_timeout: 30m
           script: |
             docker pull ${{ env.MIRROR_REPOSITORY_TAG }} \
