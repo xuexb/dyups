@@ -44,26 +44,78 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
   depoly-gz:
+    runs-on: ubuntu-latest
     environment: gz
     needs: build-and-push-image
     if: ${{ needs.build-and-push-image.result == 'success' }}
-    uses: ./.github/workflows/deploy.yml
-    secrets: inherit
-    with:
-      version: ${{ needs.build-and-push-image.outputs.version }}
+    steps:
+      - uses: ./.github/actions/deploy.yml
+        with:
+          version: ${{ needs.build-and-push-image.outputs.version }}
+          ssh-host: ${{ secrets.SSH_HOST }}
+          ssh-port: ${{ secrets.SSH_PORT }}
+          ssh-username: ${{ secrets.SSH_USERNAME }}
+          ssh-key: ${{ secrets.SSH_KEY }}
+          proxy-host: ${{ secrets.PROXY_HOST }}
+          proxy-port: ${{ secrets.PROXY_PORT }}
+          proxy-username: ${{ secrets.PROXY_USERNAME }}
+          proxy-key: ${{ secrets.PROXY_KEY }}
+          dyups-token: ${{ secrets.DYUPS_TOKEN }}
+          dyups-db-host: ${{ secrets.DYUPS_DB_HOST }}
+          dyups-db-port: ${{ secrets.DYUPS_DB_PORT }}
+          dyups-db-database: ${{ secrets.DYUPS_DB_DATABASE }}
+          dyups-db-user: ${{ secrets.DYUPS_DB_USER }}
+          dyups-db-password: ${{ secrets.DYUPS_DB_PASSWORD }}
+          dyups-db-charset: ${{ secrets.DYUPS_DB_CHARSET }}
+          ghcr-mirror: ${{ secrets.GHCR_MIRROR }}
+
   depoly-sg:
+    runs-on: ubuntu-latest
     environment: sg
     needs: [depoly-gz, build-and-push-image]
     if: ${{ needs.depoly-gz.result == 'success' }}
-    uses: ./.github/workflows/deploy.yml
-    secrets: inherit
-    with:
-      version: ${{ needs.build-and-push-image.outputs.version }}
+    steps:
+      - uses: ./.github/actions/deploy.yml
+        with:
+          version: ${{ needs.build-and-push-image.outputs.version }}
+          ssh-host: ${{ secrets.SSH_HOST }}
+          ssh-port: ${{ secrets.SSH_PORT }}
+          ssh-username: ${{ secrets.SSH_USERNAME }}
+          ssh-key: ${{ secrets.SSH_KEY }}
+          proxy-host: ${{ secrets.PROXY_HOST }}
+          proxy-port: ${{ secrets.PROXY_PORT }}
+          proxy-username: ${{ secrets.PROXY_USERNAME }}
+          proxy-key: ${{ secrets.PROXY_KEY }}
+          dyups-token: ${{ secrets.DYUPS_TOKEN }}
+          dyups-db-host: ${{ secrets.DYUPS_DB_HOST }}
+          dyups-db-port: ${{ secrets.DYUPS_DB_PORT }}
+          dyups-db-database: ${{ secrets.DYUPS_DB_DATABASE }}
+          dyups-db-user: ${{ secrets.DYUPS_DB_USER }}
+          dyups-db-password: ${{ secrets.DYUPS_DB_PASSWORD }}
+          dyups-db-charset: ${{ secrets.DYUPS_DB_CHARSET }}
+          ghcr-mirror: ${{ secrets.GHCR_MIRROR }}
   depoly-bj:
+    runs-on: ubuntu-latest
     environment: bj
     needs: [depoly-sg, build-and-push-image]
     if: ${{ needs.depoly-sg.result == 'success' }}
-    uses: ./.github/workflows/deploy.yml
-    secrets: inherit
-    with:
-      version: ${{ needs.build-and-push-image.outputs.version }}
+    steps:
+      - uses: ./.github/actions/deploy.yml
+        with:
+          version: ${{ needs.build-and-push-image.outputs.version }}
+          ssh-host: ${{ secrets.SSH_HOST }}
+          ssh-port: ${{ secrets.SSH_PORT }}
+          ssh-username: ${{ secrets.SSH_USERNAME }}
+          ssh-key: ${{ secrets.SSH_KEY }}
+          proxy-host: ${{ secrets.PROXY_HOST }}
+          proxy-port: ${{ secrets.PROXY_PORT }}
+          proxy-username: ${{ secrets.PROXY_USERNAME }}
+          proxy-key: ${{ secrets.PROXY_KEY }}
+          dyups-token: ${{ secrets.DYUPS_TOKEN }}
+          dyups-db-host: ${{ secrets.DYUPS_DB_HOST }}
+          dyups-db-port: ${{ secrets.DYUPS_DB_PORT }}
+          dyups-db-database: ${{ secrets.DYUPS_DB_DATABASE }}
+          dyups-db-user: ${{ secrets.DYUPS_DB_USER }}
+          dyups-db-password: ${{ secrets.DYUPS_DB_PASSWORD }}
+          dyups-db-charset: ${{ secrets.DYUPS_DB_CHARSET }}
+          ghcr-mirror: ${{ secrets.GHCR_MIRROR }}
