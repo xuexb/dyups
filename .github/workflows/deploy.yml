@@ -1,0 +1,49 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '部署版本'
+        default: 'latest'
+        type: string
+        required: false
+      envname:
+        description: '部署机器'
+        type: choice
+        required: false
+        default: "bj"
+        options:
+        - "bj"
+        - "gz"
+        - "sg"
+
+env:
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  depoly:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.envname }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/deploy/
+        with:
+          version: ${{ inputs.version }}
+          ssh-host: ${{ secrets.SSH_HOST }}
+          ssh-port: ${{ secrets.SSH_PORT }}
+          ssh-username: ${{ secrets.SSH_USERNAME }}
+          ssh-key: ${{ secrets.SSH_KEY }}
+          proxy-host: ${{ secrets.PROXY_HOST }}
+          proxy-port: ${{ secrets.PROXY_PORT }}
+          proxy-username: ${{ secrets.PROXY_USERNAME }}
+          proxy-key: ${{ secrets.PROXY_KEY }}
+          dyups-token: ${{ secrets.DYUPS_TOKEN }}
+          dyups-db-host: ${{ secrets.DYUPS_DB_HOST }}
+          dyups-db-port: ${{ secrets.DYUPS_DB_PORT }}
+          dyups-db-database: ${{ secrets.DYUPS_DB_DATABASE }}
+          dyups-db-user: ${{ secrets.DYUPS_DB_USER }}
+          dyups-db-password: ${{ secrets.DYUPS_DB_PASSWORD }}
+          dyups-db-charset: ${{ secrets.DYUPS_DB_CHARSET }}
+          ghcr-mirror: ${{ secrets.GHCR_MIRROR }}
