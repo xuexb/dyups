@@ -28,6 +28,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      - name: ghcr mirror
+        id: mirror
+        run: |
+          if [ "${{ inputs.envname }}" == "sg" ]; then
+            echo '::set-output name=registry::127.0.0.1:5000'
+          else
+            echo '::set-output name=registry::${{ secrets.GHCR_MIRROR }}'
+          fi
       - uses: ./.github/actions/deploy/
         with:
           version: ${{ inputs.version }}
@@ -46,4 +54,4 @@ jobs:
           dyups-db-user: ${{ secrets.DYUPS_DB_USER }}
           dyups-db-password: ${{ secrets.DYUPS_DB_PASSWORD }}
           dyups-db-charset: ${{ secrets.DYUPS_DB_CHARSET }}
-          ghcr-mirror: ${{ secrets.GHCR_MIRROR }}
+          ghcr-mirror: ${{ steps.mirror.outputs.registry }}

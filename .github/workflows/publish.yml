@@ -97,7 +97,7 @@ jobs:
           dyups-db-user: ${{ secrets.DYUPS_DB_USER }}
           dyups-db-password: ${{ secrets.DYUPS_DB_PASSWORD }}
           dyups-db-charset: ${{ secrets.DYUPS_DB_CHARSET }}
-          ghcr-mirror: ${{ secrets.GHCR_MIRROR }}
+          ghcr-mirror: 127.0.0.1:5000
   depoly-bj:
     runs-on: ubuntu-latest
     environment: bj
