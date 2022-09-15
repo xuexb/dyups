@@ -17,7 +17,7 @@ on:
           - xiaowu (name)
 
 env:
-  CA_NAME: ${{ inputs.caname || github.event.inputs.caname || "all" }}
+  CA_NAME: ${{ inputs.caname || github.event.inputs.caname || 'all' }}
   ACME: /home/runner/.acme.sh/acme.sh
   Ali_Key: ${{ secrets.ALI_KEY }}
   Ali_Secret: ${{ secrets.ALI_SECRET }}
