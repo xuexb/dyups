@@ -69,34 +69,45 @@ function _M:parseServer(data)
     return data
 end
 
-function _M:getAll()
-    local db = _M:connect();
-    if not db then return nil end
-    local sql = "select domain, server, timeout from upstream"
-    local res, err, errno, sqlstate = db:query(sql)
-    _M:close(db)
+function _M:getAllFromCache()
+    local keys = ngx.shared.upstream_list:get_keys()
+    local dnskeys = ngx.shared.upstream_list_dns:get_keys()
 
-    if res then
-        return _M:parseServer(res)
-    else
-        return nil
+
+    local result = {}
+    result.dns = {}
+    result.upstream = {}
+
+    for index, key in pairs(keys) do
+        local cached = ngx.shared.upstream_list:get(key)
+        if cached then
+           result.upstream[index] = cjson.decode(cached)
+        end
     end
+    for index, key in pairs(dnskeys) do
+        local cached = ngx.shared.upstream_list_dns:get(key)
+        if cached then
+            result.dns[index] = cjson.decode(cached)
+        end
+    end
+
+    return result
 end
 
-function _M:getByDomain(domain)
-    local db = _M:connect();
-    if not db then
-        return nil
-    end
-    local sql = "select domain, server, timeout from upstream where domain = " .. ngx.quote_sql_str(domain) .. " limit 1"
-    local res, err, errno, sqlstate = db:query(sql)
-    _M:close(db)
+function _M:getByDomainFromCache(domain)
+    local result = {}
+    result.dns = {}
+    result.upstream = {}
 
-    if res then
-        return _M:parseServer(res)[1]
-    else
-        return nil
+    local cached = ngx.shared.upstream_list:get(domain)
+    if cached then
+        result.upstream = cjson.decode(cached)
     end
+    local dnscached = ngx.shared.upstream_list_dns:get(domain)
+    if dnscached then
+        result.dns = cjson.decode(dnscached)
+    end
+    return result
 end
 
 function _M:removeDomain(domain)
@@ -120,10 +131,18 @@ function _M:addDomain(domain, server, timeout)
 end
 
 function _M:reload()
-    local data = _M:getAll()
-    if not data then
+    local db = _M:connect();
+    if not db then
         return nil
     end
+    local sql = "select domain, server, timeout from upstream"
+    local res, err, errno, sqlstate = db:query(sql)
+    _M:close(db)
+    if not res then
+        return nil
+    end
+
+    local data = _M:parseServer(res)
 
     -- 先清空缓存
     ngx.shared.upstream_list:flush_all()
