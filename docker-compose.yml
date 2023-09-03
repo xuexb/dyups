@@ -15,11 +15,5 @@ services:
       - ./lua:/etc/nginx/lua
       - ./vhost:/etc/nginx/vhost
       - ./nginx.conf:/etc/nginx/nginx.conf
-    environment:
-      DYUPS_TOKEN: KPlxQHExYQGMAwtepoYi
-      DYUPS_DB_HOST: 8.141.208.241
-      DYUPS_DB_PORT: 3306
-      DYUPS_DB_DATABASE: xiaowudev_dyups
-      DYUPS_DB_USER: user_xiaowudev_dyups_prd
-      DYUPS_DB_PASSWORD: DoA5+1!XR@oYr6h&g1T1udf
-      DYUPS_DB_CHARSET: utf8mb4
+    env_file:
+      - ./.env

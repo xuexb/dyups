@@ -17,18 +17,6 @@ inputs:
   ssh-key:
     description: "SSH private key"
     required: true
-  proxy-host:
-    description: "SSH Porxy HOST"
-    required: true
-  proxy-port:
-    description: "SSH Porxy Port"
-    required: true
-  proxy-username:
-    description: "SSH Porxy Username"
-    required: true
-  proxy-key:
-    description: "SSH Porxy private key"
-    required: true
   dyups-token:
     description: "dyups token"
     required: true
@@ -50,9 +38,6 @@ inputs:
   dyups-db-charset:
     description: "dyups MySQL charset"
     required: true
-  ghcr-mirror:
-    description: "ghcr mirror"
-    required: true
   container-name:
     description: "docker container name"
     default: "dyups"
@@ -68,13 +53,9 @@ runs:
         username: ${{ inputs.ssh-username }}
         key: ${{ inputs.ssh-key }}
         port: ${{ inputs.ssh-port }}
-        proxy_host: ${{ inputs.proxy-host }}
-        proxy_username: ${{ inputs.proxy-username }}
-        proxy_key: ${{ inputs.proxy-key }}
-        proxy_port: ${{ inputs.proxy-port }}
         command_timeout: 30m
         script: |
-          docker pull ${{ inputs.ghcr-mirror }}/xuexb/dyups:${{ inputs.version }} \
+          docker pull ghcr.io/xuexb/dyups:${{ inputs.version }} \
             && (docker ps -aq --filter "name=^${{ inputs.container-name }}$" | xargs docker rm -f || echo "Delete fail") \
             && docker run \
             --restart=always \
@@ -89,7 +70,7 @@ runs:
             --env "DYUPS_DB_USER=${{ inputs.dyups-db-user }}" \
             --env "DYUPS_DB_PASSWORD=${{ inputs.dyups-db-password }}" \
             --env "DYUPS_DB_CHARSET=${{ inputs.dyups-db-charset }}" \
-            ${{ inputs.ghcr-mirror }}/xuexb/dyups:${{ inputs.version }} \
+            ghcr.io/xuexb/dyups:${{ inputs.version }} \
           && sleep 2 \
           && if [ "$(curl -sL -w '%{http_code}' -H 'host: dyups' -H 'x-dyups-token: ${{ inputs.dyups-token }}' --connect-timeout 3 127.0.0.1/api/reload?r=$RANDOM -o /dev/null)" != "200" ]; then exit 2; fi \
           && sleep 5

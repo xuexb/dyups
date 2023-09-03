@@ -58,10 +58,6 @@ jobs:
           ssh-port: ${{ secrets.SSH_PORT }}
           ssh-username: ${{ secrets.SSH_USERNAME }}
           ssh-key: ${{ secrets.SSH_KEY }}
-          proxy-host: ${{ secrets.PROXY_HOST }}
-          proxy-port: ${{ secrets.PROXY_PORT }}
-          proxy-username: ${{ secrets.PROXY_USERNAME }}
-          proxy-key: ${{ secrets.PROXY_KEY }}
           dyups-token: ${{ secrets.DYUPS_TOKEN }}
           dyups-db-host: ${{ secrets.DYUPS_DB_HOST }}
           dyups-db-port: ${{ secrets.DYUPS_DB_PORT }}
@@ -69,7 +65,6 @@ jobs:
           dyups-db-user: ${{ secrets.DYUPS_DB_USER }}
           dyups-db-password: ${{ secrets.DYUPS_DB_PASSWORD }}
           dyups-db-charset: ${{ secrets.DYUPS_DB_CHARSET }}
-          ghcr-mirror: ${{ secrets.GHCR_MIRROR }}
 
   depoly-sg:
     runs-on: ubuntu-latest
@@ -86,10 +81,6 @@ jobs:
           ssh-port: ${{ secrets.SSH_PORT }}
           ssh-username: ${{ secrets.SSH_USERNAME }}
           ssh-key: ${{ secrets.SSH_KEY }}
-          proxy-host: ${{ secrets.PROXY_HOST }}
-          proxy-port: ${{ secrets.PROXY_PORT }}
-          proxy-username: ${{ secrets.PROXY_USERNAME }}
-          proxy-key: ${{ secrets.PROXY_KEY }}
           dyups-token: ${{ secrets.DYUPS_TOKEN }}
           dyups-db-host: ${{ secrets.DYUPS_DB_HOST }}
           dyups-db-port: ${{ secrets.DYUPS_DB_PORT }}
@@ -97,7 +88,6 @@ jobs:
           dyups-db-user: ${{ secrets.DYUPS_DB_USER }}
           dyups-db-password: ${{ secrets.DYUPS_DB_PASSWORD }}
           dyups-db-charset: ${{ secrets.DYUPS_DB_CHARSET }}
-          ghcr-mirror: 127.0.0.1:5000
   depoly-bj:
     runs-on: ubuntu-latest
     environment: bj
@@ -113,10 +103,6 @@ jobs:
           ssh-port: ${{ secrets.SSH_PORT }}
           ssh-username: ${{ secrets.SSH_USERNAME }}
           ssh-key: ${{ secrets.SSH_KEY }}
-          proxy-host: ${{ secrets.PROXY_HOST }}
-          proxy-port: ${{ secrets.PROXY_PORT }}
-          proxy-username: ${{ secrets.PROXY_USERNAME }}
-          proxy-key: ${{ secrets.PROXY_KEY }}
           dyups-token: ${{ secrets.DYUPS_TOKEN }}
           dyups-db-host: ${{ secrets.DYUPS_DB_HOST }}
           dyups-db-port: ${{ secrets.DYUPS_DB_PORT }}
@@ -124,4 +110,3 @@ jobs:
           dyups-db-user: ${{ secrets.DYUPS_DB_USER }}
           dyups-db-password: ${{ secrets.DYUPS_DB_PASSWORD }}
           dyups-db-charset: ${{ secrets.DYUPS_DB_CHARSET }}
-          ghcr-mirror: ${{ secrets.GHCR_MIRROR }}
