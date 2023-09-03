@@ -62,7 +62,7 @@ runs:
   using: "composite"
   steps:
     - name: Deploy
-      uses: appleboy/ssh-action@dce9d565de8d876c11d93fa4fe677c0285a66d78
+      uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ inputs.ssh-host }}
         username: ${{ inputs.ssh-username }}

@@ -27,7 +27,7 @@ jobs:
           password: ${{ secrets.GHCR_READ_WRITE_TOKEN }}
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@v2
+        uses: docker/metadata-action@v4
         with:
           images: ghcr.io/${{ env.IMAGE_NAME }}
           flavor: |
@@ -37,7 +37,7 @@ jobs:
             type=ref,event=pr
             type=semver,pattern={{version}}
       - name: Build Docker image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           push: true
