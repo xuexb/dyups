@@ -23,8 +23,8 @@ local function getKey(upstream)
 end
 
 if not upstreams then
-    ngx.log(ngx.ERR, "upstreams not found, set 502")
-    return set_current_peer({ address = "127.0.0.1", port = 502 })
+    ngx.log(ngx.ERR, "upstreams not found, set 404")
+    return set_current_peer({ address = "127.0.0.1", port = 1404 })
 end
 
 if not ngx.ctx.retry then
