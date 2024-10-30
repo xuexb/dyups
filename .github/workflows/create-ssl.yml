@@ -13,7 +13,6 @@ on:
         options:
           - all
           - xuexb (ali)
-          - jiandansousuo (ali)
           - xiaowu (name)
 
 env:
@@ -52,22 +51,6 @@ jobs:
             -d "xuexb.com" \
             --key-file ./ca/xuexb/xuexb.key \
             --fullchain-file ./ca/xuexb/xuexb.cer
-      - name: Create jiandansousuo SSL
-        if: ${{ env.CA_NAME == 'all' || startsWith(env.CA_NAME, 'jiandansousuo') }}
-        run: |
-          mkdir -p ./ca/jiandansousuo
-          $ACME --issue \
-            --server letsencrypt \
-            --dns dns_ali \
-            --log \
-            -d "jiandansousuo.com" \
-            -d "jiandansousuo.cn" \
-            -d "*.jiandansousuo.cn" \
-            -d "*.jiandansousuo.com"
-          $ACME --installcert \
-            -d "jiandansousuo.com" \
-            --key-file ./ca/jiandansousuo/jiandansousuo.key \
-            --fullchain-file ./ca/jiandansousuo/jiandansousuo.cer
       - name: Create xiaowu SSL
         if: ${{ env.CA_NAME == 'all' || startsWith(env.CA_NAME, 'xiaowu') }}
         run: |
@@ -78,8 +61,6 @@ jobs:
             --log \
             -d "xiaowu.dev" \
             -d "*.xiaowu.dev" \
-            -d "jiandansousuo.org" \
-            -d "*.jiandansousuo.org" \
             -d "apijs.org" \
             -d "*.apijs.org" \
             -d "kakawoniu.com" \
