@@ -43,34 +43,11 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-  depoly-gz:
-    runs-on: ubuntu-latest
-    environment: gz
-    needs: build-and-push-image
-    if: ${{ needs.build-and-push-image.result == 'success' }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - uses: ./.github/actions/deploy/
-        with:
-          version: ${{ needs.build-and-push-image.outputs.version }}
-          ssh-host: ${{ secrets.SSH_HOST }}
-          ssh-port: ${{ secrets.SSH_PORT }}
-          ssh-username: ${{ secrets.SSH_USERNAME }}
-          ssh-key: ${{ secrets.SSH_KEY }}
-          dyups-token: ${{ secrets.DYUPS_TOKEN }}
-          dyups-db-host: ${{ secrets.DYUPS_DB_HOST }}
-          dyups-db-port: ${{ secrets.DYUPS_DB_PORT }}
-          dyups-db-database: ${{ secrets.DYUPS_DB_DATABASE }}
-          dyups-db-user: ${{ secrets.DYUPS_DB_USER }}
-          dyups-db-password: ${{ secrets.DYUPS_DB_PASSWORD }}
-          dyups-db-charset: ${{ secrets.DYUPS_DB_CHARSET }}
-
   depoly-sg:
     runs-on: ubuntu-latest
     environment: sg
-    needs: [depoly-gz, build-and-push-image]
-    if: ${{ needs.depoly-gz.result == 'success' }}
+    needs: build-and-push-image
+    if: ${{ needs.build-and-push-image.result == 'success' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
