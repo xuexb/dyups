@@ -65,8 +65,6 @@ jobs:
             -d "*.apijs.org" \
             -d "kakawoniu.com" \
             -d "*.kakawoniu.com" \
-            -d "shangxian.app" \
-            -d "*.shangxian.app" \
             -d "xiaoshuo.io" \
             -d "*.xiaoshuo.io"
           $ACME --installcert \
