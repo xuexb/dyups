@@ -10,6 +10,7 @@ on:
 
 env:
   IMAGE_NAME: ${{ github.repository }}
+  CONTAINER_NAME: dyups
 
 jobs:
   build-and-push-image:
@@ -43,47 +44,49 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-  depoly-sg:
+  depoly:
     runs-on: ubuntu-latest
-    environment: sg
     needs: build-and-push-image
     if: ${{ needs.build-and-push-image.result == 'success' }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - uses: ./.github/actions/deploy/
+      - name: Configure 1Password Service Account
+        uses: 1password/load-secrets-action/configure@v2
         with:
-          version: ${{ needs.build-and-push-image.outputs.version }}
-          ssh-host: ${{ secrets.SSH_HOST }}
-          ssh-port: ${{ secrets.SSH_PORT }}
-          ssh-username: ${{ secrets.SSH_USERNAME }}
-          ssh-key: ${{ secrets.SSH_KEY }}
-          dyups-token: ${{ secrets.DYUPS_TOKEN }}
-          dyups-db-host: ${{ secrets.DYUPS_DB_HOST }}
-          dyups-db-port: ${{ secrets.DYUPS_DB_PORT }}
-          dyups-db-database: ${{ secrets.DYUPS_DB_DATABASE }}
-          dyups-db-user: ${{ secrets.DYUPS_DB_USER }}
-          dyups-db-password: ${{ secrets.DYUPS_DB_PASSWORD }}
-          dyups-db-charset: ${{ secrets.DYUPS_DB_CHARSET }}
-  depoly-bj:
-    runs-on: ubuntu-latest
-    environment: bj
-    needs: [depoly-sg, build-and-push-image]
-    if: ${{ needs.depoly-sg.result == 'success' }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - uses: ./.github/actions/deploy/
+          service-account-token: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      - name: Load credentials
+        uses: 1password/load-secrets-action@v2
         with:
-          version: ${{ needs.build-and-push-image.outputs.version }}
-          ssh-host: ${{ secrets.SSH_HOST }}
-          ssh-port: ${{ secrets.SSH_PORT }}
-          ssh-username: ${{ secrets.SSH_USERNAME }}
-          ssh-key: ${{ secrets.SSH_KEY }}
-          dyups-token: ${{ secrets.DYUPS_TOKEN }}
-          dyups-db-host: ${{ secrets.DYUPS_DB_HOST }}
-          dyups-db-port: ${{ secrets.DYUPS_DB_PORT }}
-          dyups-db-database: ${{ secrets.DYUPS_DB_DATABASE }}
-          dyups-db-user: ${{ secrets.DYUPS_DB_USER }}
-          dyups-db-password: ${{ secrets.DYUPS_DB_PASSWORD }}
-          dyups-db-charset: ${{ secrets.DYUPS_DB_CHARSET }}
+          export-env: true
+        env:
+          SSH_HOST: "op://ecs-cicd/dyups-agent/mjqbkhplbfjdp6eacrvkr36hsa/host"
+          SSH_USERNAME: "op://ecs-cicd/dyups-agent/mjqbkhplbfjdp6eacrvkr36hsa/username"
+          SSH_KEY: "op://ecs-cicd/dyups-agent/private_key"
+          SSH_PORT: "op://ecs-cicd/dyups-agent/mjqbkhplbfjdp6eacrvkr36hsa/port"
+      - name: Deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USERNAME }}
+          key: ${{ env.SSH_KEY }}
+          port: ${{ env.SSH_PORT }}
+          command_timeout: 30m
+          script: |
+            docker pull ghcr.io/xuexb/dyups:${{ needs.build-and-push-image.outputs.version }} \
+              && (docker ps -aq --filter "name=^${{ env.CONTAINER_NAME }}$" | xargs docker rm -f || echo "Delete fail") \
+              && docker run \
+              --restart=always \
+              -p 80:80 \
+              -p 443:443 \
+              -d \
+              --name "${{ env.CONTAINER_NAME }}" \
+              --env "DYUPS_TOKEN=${{ secrets.DYUPS_TOKEN }}" \
+              --env "DYUPS_DB_HOST=${{ secrets.DYUPS_DB_HOST }}" \
+              --env "DYUPS_DB_PORT=${{ secrets.DYUPS_DB_PORT }}" \
+              --env "DYUPS_DB_DATABASE=${{ secrets.DYUPS_DB_DATABASE }}" \
+              --env "DYUPS_DB_USER=${{ secrets.DYUPS_DB_USER }}" \
+              --env "DYUPS_DB_PASSWORD=${{ secrets.DYUPS_DB_PASSWORD }}" \
+              --env "DYUPS_DB_CHARSET=${{ secrets.DYUPS_DB_CHARSET }}" \
+              ghcr.io/xuexb/dyups:${{ needs.build-and-push-image.outputs.version }} \
+            && sleep 2 \
+            && if [ "$(curl -sL -w '%{http_code}' -H 'host: dyups' -H 'x-dyups-token: ${{ secrets.DYUPS_TOKEN }}' --connect-timeout 3 127.0.0.1/api/reload?r=$RANDOM -o /dev/null)" != "200" ]; then exit 2; fi \
+            && sleep 5
