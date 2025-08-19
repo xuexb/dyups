@@ -5,8 +5,6 @@ on:
   push:
     tags:
       - "v*"
-    branches:
-      - master
 
 env:
   IMAGE_NAME: ${{ github.repository }}
@@ -49,15 +47,11 @@ jobs:
     needs: build-and-push-image
     if: ${{ needs.build-and-push-image.result == 'success' }}
     steps:
-      - name: Configure 1Password Service Account
-        uses: 1password/load-secrets-action/configure@v2
-        with:
-          service-account-token: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
       - name: Load credentials
-        uses: 1password/load-secrets-action@v2
-        with:
-          export-env: true
+        id: load_secret
+        uses: 1password/load-secrets-action@v3
         env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           SSH_HOST: "op://ecs-cicd/dyups-agent/mjqbkhplbfjdp6eacrvkr36hsa/host"
           SSH_USERNAME: "op://ecs-cicd/dyups-agent/mjqbkhplbfjdp6eacrvkr36hsa/username"
           SSH_KEY: "op://ecs-cicd/dyups-agent/private_key"
@@ -65,10 +59,10 @@ jobs:
       - name: Deploy
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ env.SSH_HOST }}
-          username: ${{ env.SSH_USERNAME }}
-          key: ${{ env.SSH_KEY }}
-          port: ${{ env.SSH_PORT }}
+          host: ${{ steps.load_secrets.SSH_HOST }}
+          username: ${{ steps.load_secrets.SSH_USERNAME }}
+          key: ${{ steps.load_secrets.SSH_KEY }}
+          port: ${{ steps.load_secrets.SSH_PORT }}
           command_timeout: 30m
           script: |
             docker pull ghcr.io/xuexb/dyups:${{ needs.build-and-push-image.outputs.version }} \
