@@ -46,6 +46,8 @@ jobs:
             -d "*.static.xuexb.com" \
             -d "*.dev.xuexb.com" \
             -d "*.proxy.xuexb.com" \
+            -d "kakawoniu.com" \
+            -d "*.kakawoniu.com" \
             -d "*.api.xuexb.com"
           $ACME --installcert \
             -d "xuexb.com" \
@@ -63,8 +65,6 @@ jobs:
             -d "*.xiaowu.dev" \
             -d "apijs.org" \
             -d "*.apijs.org" \
-            -d "kakawoniu.com" \
-            -d "*.kakawoniu.com" \
             -d "xiaoshuo.io" \
             -d "*.xiaoshuo.io"
           $ACME --installcert \
