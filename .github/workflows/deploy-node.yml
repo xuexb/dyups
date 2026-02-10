@@ -32,15 +32,11 @@ jobs:
   depoly:
     runs-on: ubuntu-latest
     steps:
-      - name: Configure 1Password Service Account
-        uses: 1password/load-secrets-action/configure@v2
-        with:
-          service-account-token: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
       - name: Load credentials
-        uses: 1password/load-secrets-action@v2
-        with:
-          export-env: true
+        id: load_secrets
+        uses: 1password/load-secrets-action@v3
         env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           SSH_USERNAME: "op://ecs-cicd/dyups-agent/mjqbkhplbfjdp6eacrvkr36hsa/username"
           SSH_KEY: "op://ecs-cicd/dyups-agent/private_key"
           SSH_PORT: "op://ecs-cicd/dyups-agent/mjqbkhplbfjdp6eacrvkr36hsa/port"
@@ -48,9 +44,9 @@ jobs:
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ env.SSH_HOST }}
-          username: ${{ env.SSH_USERNAME }}
-          key: ${{ env.SSH_KEY }}
-          port: ${{ env.SSH_PORT }}
+          username: ${{ steps.load_secrets.outputs.SSH_USERNAME }}
+          key: ${{ steps.load_secrets.outputs.SSH_KEY }}
+          port: ${{ steps.load_secrets.outputs.SSH_PORT }}
           command_timeout: 30m
           script: |
             docker pull ghcr.io/xuexb/dyups:${{ inputs.version }} \
