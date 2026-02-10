@@ -48,7 +48,7 @@ jobs:
     if: ${{ needs.build-and-push-image.result == 'success' }}
     steps:
       - name: Load credentials
-        id: load_secret
+        id: load_secrets
         uses: 1password/load-secrets-action@v3
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
@@ -59,10 +59,10 @@ jobs:
       - name: Deploy
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ steps.load_secrets.SSH_HOST }}
-          username: ${{ steps.load_secrets.SSH_USERNAME }}
-          key: ${{ steps.load_secrets.SSH_KEY }}
-          port: ${{ steps.load_secrets.SSH_PORT }}
+          host: ${{ steps.load_secrets.outputs.SSH_HOST }}
+          username: ${{ steps.load_secrets.outputs.SSH_USERNAME }}
+          key: ${{ steps.load_secrets.outputs.SSH_KEY }}
+          port: ${{ steps.load_secrets.outputs.SSH_PORT }}
           command_timeout: 30m
           script: |
             docker pull ghcr.io/xuexb/dyups:${{ needs.build-and-push-image.outputs.version }} \
